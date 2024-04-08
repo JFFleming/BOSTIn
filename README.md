@@ -81,22 +81,74 @@ protein is for amino acid datasets, while dna is for nucleotide datasets.
 BOSTIn produces a huge number of results files, and some of these will be of more general use than others. For each option:
 
 # Branch Length Heterogeneity
-<prefix>.BranchHeterogeneity.NarrativeReport.txt  - This is the narrative report explaining your Branch Length Heterogeneity results (see narrative reports section below)
-<prefix>.LBScore.Taxa.redflags.txt - This is a list of the taxa that BOSTIn identifies as "red flags" in your dataset based on branch length heterogeneity - ones that should be considered for removal or alteration.
-<prefix>.LBScore.Taxa.yellowflags.txt	- This is a list of the taxa that BOSTIn identifies as "yellow flags" in your dataset based on branch length heterogeneity - ones that could cause problems.
-<prefix>.LBSummary.histogram.pdf - This is a histogram of the taxon-specific LB-Scores, so that you can see what the overal distribution of branch length heterogeneity looks like in your dataset.
-<prefix>.LBSummary.txt - This is a summary of the whole dataset LB-Scores - the mean and quartile values.
-<prefix>.LBi-scores - This is a list of the LB-Scores for each taxa
+
+\<prefix\>.BranchHeterogeneity.NarrativeReport.txt  - This is the narrative report explaining your Branch Length Heterogeneity results (see narrative reports section below)
+
+\<prefix\>.LBScore.Taxa.redflags.txt - This is a list of the taxa that BOSTIn identifies as "red flags" in your dataset based on branch length heterogeneity - ones that should be considered for removal or alteration.
+
+\<prefix\>.LBScore.Taxa.yellowflags.txt	- This is a list of the taxa that BOSTIn identifies as "yellow flags" in your dataset based on branch length heterogeneity - ones that could cause problems.
+
+\<prefix\>.LBSummary.histogram.pdf - This is a histogram of the taxon-specific LB-Scores, so that you can see what the overal distribution of branch length heterogeneity looks like in your dataset.
+
+\<prefix\>.LBSummary.txt - This is a summary of the whole dataset LB-Scores - the mean and quartile values.
+
+\<prefix\>.LBi-scores - This is a list of the LB-Scores for each taxa
 
 # Compositional Heterogeneity
-<prefix>.Frequencies.txt
-<prefix>.RCFV.txt
-<prefix>.ncsRCFV
-<prefix>.ntRCFV
+\<prefix\>.CompositionalHeterogeneity.NarrativeReport.txt  - This is the narrative report explaining your CompositionalHeterogeneity results (see narrative reports section below)
+
+\<prefix\>.Frequencies.txt - This is a list of the basic frequencies of each amino acid or nucleotide across each taxa in the dataset
+
+\<prefix\>.RCFV.txt - This shows the nRCFV and RCFV of the dataset
+
+
+\<prefix\>.ncsRCFV.txt - This is a simple list of the normalised csRCFV score for each character in your dataset.
+
+\<prefix\>.ncsRCFV.CompHet.Character.redflags.txt - This is a list of the characters that BOSTIn identifies as "red flags" in your dataset based on compositional heterogeneity - ones that should be considered for removal or alteration.
+
+\<prefix\>.ncsRCFV.CompHet.Character.yellowflags.txt - This is a list of the characters that BOSTIn identifies as "yellow flags" in your dataset based on compositional heterogeneity - ones that could cause problems.
+
+\<prefix\>.ncsRCFV.histogram.pdf - This is a histogram of the normalised csRCFV scores, so that you can see what the overal distribution of compositional heterogeneity looks like across characters in your dataset.
+
+\<prefix\>.ncsRCFV.summary.txt - This shows a list of summary statistics for the normalised csRCFV scores. The mean and median, alongside the standard deviation and median absolute deviation, help us understand the distribution of compositional heterogeneity across a dataset.
+
+
+\<prefix\>.ntRCFV.txt - This is a simple list of the normalised tRCFV score for each taxa in your dataset.
+
+\<prefix\>.ntRCFV.CompHet.Taxa.redflags.txt - This is a list of the taxa that BOSTIn identifies as "red flags" in your dataset based on compositional heterogeneity - ones that should be considered for removal or alteration.
+
+\<prefix\>.ntRCFV.CompHet.Taxa.yellowflags.txt - This is a list of the taxa that BOSTIn identifies as "yellow flags" in your dataset based on compositional heterogeneity - ones that could cause problems.
+
+\<prefix\>.ntRCFV.histogram.pdf - This is a histogram of the normalised tRCFV scores, so that you can see what the overal distribution of compositional heterogeneity looks like across taxa in your dataset.
+
+\<prefix\>.ntRCFV.summary.txt - This shows a list of summary statistics for the normalised tRCFV scores. The mean and median, alongside the standard deviation and median absolute deviation, help us understand the distribution of compositional heterogeneity across a dataset.
 
 
 # Site Saturation
 
+\<prefix\>.SiteSaturation.NarrativeReport.txt - This is the narrative report explaining your Site Saturation results (see narrative reports section below)
+
+\<prefix\>.SiteSaturation.TotalFrequencies.txt - This is a file containing the DE-score of your entire dataset.
+
+\<prefix\>.SiteSaturation.TaxaFrequencies.SiteSat.Taxa.redflags.txt - This is a list of the taxa that BOSTIn identifies as "red flags" in your dataset based on site saturation - ones that should be considered for removal or alteration.
+
+\<prefix\>.SiteSaturation.TaxaFrequencies.SiteSat.Taxa.yellowflags.txt - This is a list of the taxa that BOSTIn identifies as "yellow flags" in your dataset based on site saturation - ones that could cause problems.
+
+\<prefix\>.SiteSaturation.TaxaFrequencies.histogram.pdf - This is a histogram of the taxa-specific DE-Scores scores, so that you can see what the overal distribution of site saturation looks like across taxa in your dataset.
+
+\<prefix\>.SiteSaturation.TaxaFrequencies.summary.txt This shows a list of summary statistics for the taxa-specific DE-scores. The mean and median, alongside the standard deviation and median absolute deviation, help us understand the distribution of site saturation across a dataset.
+
+\<prefix\>.SiteSaturation.TaxaFrequencies.txt - This is a simple list of the DE-scores for each taxa in your dataset.
+
+
+# The Narrative Report
+Unique to BOSTIn is the Narrative Report function. This is intended as a way to explain not just which sequences are good or bad, but also why! No more hunting through opaque documentation, instead, BOSTIn customises answers for your dataset, and tells you why it has made the decisions it has made.
+BOSTIn implements a number of simple summary statistic-based tests to identify red and yellow flagged taxa or characters, depending on the metric. What that means will differ from dataset to dataset. Red flags generally require attention, while yellow flags might be ignorable, especially if a taxa is particularly important to the dataset.
+The Narrative report will also suggest potential next steps, such as data recoding, and will explain why that might be useful (and potential risks, too), so you can be informed about how you approach your data.
+It's the part we're most excited about, but also the part that needs the most fine-tuning, so if you have any suggestions for extra details you'd like to see, do get in touch through the GitHub!
+
+
 # References
-Struck 2014
-Fleming & Struck 2023
+Struck, T.H., 2014. TreSpEx–-detection of misleading signal in phylogenetic reconstructions based on tree information. Evolutionary Bioinformatics, 10, pp.EBO-S14239.
+
+Fleming, J.F. and Struck, T.H., 2023. nRCFV: a new, dataset-size-independent metric to quantify compositional heterogeneity in nucleotide and amino acid datasets. BMC bioinformatics, 24(1), p.145.
