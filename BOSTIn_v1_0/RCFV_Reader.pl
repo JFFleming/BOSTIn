@@ -33,15 +33,15 @@ my $fasta  = FAST::Bio::SeqIO->new(-file => $ARGV[1], -format => 'Fasta', -alpha
 #print "my $fasta  = FAST::Bio::SeqIO->new(-file => $ARGV[1], -format => 'Fasta', -alphabet => $ARGV[0]);";
 my $seqnum=0;
 my $RCFV_File = "$ARGV[2].RCFV.txt";
-my $csRCFV_File = "$ARGV[2].csRCFV.txt";
-my $tRCFV_File = "$ARGV[2].tRCFV.txt";
+#my $csRCFV_File = "$ARGV[2].csRCFV.txt";
+#my $tRCFV_File = "$ARGV[2].tRCFV.txt";
 my $ncsRCFV_File = "$ARGV[2].ncsRCFV.txt";
 my $ntRCFV_File = "$ARGV[2].ntRCFV.txt";
 my $outfile = "$ARGV[2].Frequencies.txt";
 open(OUT, '>', $outfile) or die $!;
 open(RCFV_OUT, '>', $RCFV_File) or die $!;
-open(CSRCFV_OUT, '>', $csRCFV_File) or die $!;
-open(TRCFV_OUT, '>', $tRCFV_File) or die $!;
+#open(CSRCFV_OUT, '>', $csRCFV_File) or die $!;
+#open(TRCFV_OUT, '>', $tRCFV_File) or die $!;
 open(NCSRCFV_OUT,  '>', $ncsRCFV_File) or die $!;
 open(NTRCFV_OUT, '>', $ntRCFV_File) or die $!;
 
@@ -146,7 +146,7 @@ foreach my $Tkey (keys %T_Freqs){
 my $T_RCFV_Total = eval join '+', values %T_RCFV_List;
 my $T_RCFV = $T_RCFV_Total/$A_Size;
 
-print TRCFV_OUT "\ntRCFV values:\n";
+#print TRCFV_OUT "\ntRCFV values:\n";
 print NTRCFV_OUT "\nntRCFV values:\n";
 
 #Calculate tRCFV
@@ -155,7 +155,7 @@ my $tRCFV;
 foreach(@ID_List){
 	my $unlock=$_;
 	$tRCFV = ($A_RCFV_List{$unlock}+$C_RCFV_List{$unlock}+$G_RCFV_List{$unlock}+$T_RCFV_List{$unlock})/$A_Size;
-	print TRCFV_OUT $_,"\t",$tRCFV,"\n";
+	#print TRCFV_OUT $_,"\t",$tRCFV,"\n";
 	print NTRCFV_OUT $_,"\t",(0.25*$tRCFV*$A_Size*sqrt($Length[0]))/100,"\n";
 	$i++;
 	}
@@ -163,7 +163,7 @@ foreach(@ID_List){
 my $RCFV = $A_RCFV + $C_RCFV + $G_RCFV + $T_RCFV;
 my $nRCFV = $RCFV/(($Length[0]**-0.5)*400);
 
-print CSRCFV_OUT "character RCFV values:\ncsRCFV(A)\t", $A_RCFV, "\ncsRCFV(C)\t", $C_RCFV, "\ncsRCFV(G)\t", $G_RCFV, "\ncsRCFV(T)\t", $T_RCFV, "\n";
+#print CSRCFV_OUT "character RCFV values:\ncsRCFV(A)\t", $A_RCFV, "\ncsRCFV(C)\t", $C_RCFV, "\ncsRCFV(G)\t", $G_RCFV, "\ncsRCFV(T)\t", $T_RCFV, "\n";
 
 print NCSRCFV_OUT "character RCFV values:\ncsRCFV(A)\t", $A_RCFV/(($Length[0]**-0.5)*100), "\ncsRCFV(C)\t", $C_RCFV/(($Length[0]**-0.5)*100), "\ncsRCFV(G)\t", $G_RCFV/(($Length[0]**-0.5)*100), "\ncsRCFV(T)\t", 
 $T_RCFV/(($Length[0]**-0.5)*100), "\n";
@@ -548,7 +548,7 @@ foreach my $Hkey (keys %H_Freqs){
 my $H_RCFV_Total = eval join '+', values %H_RCFV_List;
 my $H_RCFV = $H_RCFV_Total/$A_Size;
 
-print TRCFV_OUT "tRCFV values:\n";
+#print TRCFV_OUT "tRCFV values:\n";
 print NTRCFV_OUT "ntRCFV values:\n";
 
 #Calculate tRCFV
@@ -559,7 +559,7 @@ foreach(@ID_List){
 	$tRCFV = ($A_RCFV_List{$unlock} + $V_RCFV_List{$unlock} + $L_RCFV_List{$unlock} + $I_RCFV_List{$unlock} + $P_RCFV_List{$unlock} + $M_RCFV_List{$unlock} + $F_RCFV_List{$unlock} + $W_RCFV_List{$unlock} + 
 $G_RCFV_List{$unlock} + $S_RCFV_List{$unlock} + $T_RCFV_List{$unlock} + $C_RCFV_List{$unlock} + $N_RCFV_List{$unlock} + $Q_RCFV_List{$unlock} + $Y_RCFV_List{$unlock} + $D_RCFV_List{$unlock} + 
 $E_RCFV_List{$unlock} + $K_RCFV_List{$unlock} + $R_RCFV_List{$unlock} + $H_RCFV_List{$unlock})/$A_Size;
-	print TRCFV_OUT $_,"\t",$tRCFV,"\n";
+	#print TRCFV_OUT $_,"\t",$tRCFV,"\n";
 	print NTRCFV_OUT $_,"\t",(0.05*$tRCFV*$A_Size*sqrt($Length[0]))/100,"\n";
 	$i++;
 	}
@@ -570,9 +570,9 @@ my $nRCFV = $RCFV/(($Length[0]**-0.5)*2000);
 #my $baseline = $Length[0];
 #print $baseline**-0.5, "\n";
 
-print CSRCFV_OUT "character RCFV values:\ncsRCFV(A)\t", $A_RCFV, "\ncsRCFV(V)\t", $V_RCFV, "\ncsRCFV(L)\t", $L_RCFV, "\ncsRCFV(I)\t", $I_RCFV, "\ncsRCFV(P)\t", $P_RCFV, "\ncsRCFV(M)\t", $M_RCFV, 
-"\ncsRCFV(F)\t", $F_RCFV, "\ncsRCFV(W)\t", $W_RCFV, "\ncsRCFV(G)\t", $G_RCFV, "\ncsRCFV(S)\t", $S_RCFV, "\ncsRCFV(T)\t", $T_RCFV, "\ncsRCFV(C)\t", $C_RCFV, "\ncsRCFV(N)\t", $N_RCFV, "\ncsRCFV(Q)\t", $Q_RCFV, 
-"\ncsRCFV(Y)\t", $Y_RCFV, "\ncsRCFV(D)\t", $D_RCFV, "\ncsRCFV(E)\t", $E_RCFV, "\ncsRCFV(K)\t", $K_RCFV, "\ncsRCFV(R)\t", $R_RCFV, "\ncsRCFV(H)\t", $H_RCFV, "\n";
+#print CSRCFV_OUT "character RCFV values:\ncsRCFV(A)\t", $A_RCFV, "\ncsRCFV(V)\t", $V_RCFV, "\ncsRCFV(L)\t", $L_RCFV, "\ncsRCFV(I)\t", $I_RCFV, "\ncsRCFV(P)\t", $P_RCFV, "\ncsRCFV(M)\t", $M_RCFV, 
+#"\ncsRCFV(F)\t", $F_RCFV, "\ncsRCFV(W)\t", $W_RCFV, "\ncsRCFV(G)\t", $G_RCFV, "\ncsRCFV(S)\t", $S_RCFV, "\ncsRCFV(T)\t", $T_RCFV, "\ncsRCFV(C)\t", $C_RCFV, "\ncsRCFV(N)\t", $N_RCFV, "\ncsRCFV(Q)\t", $Q_RCFV, 
+#"\ncsRCFV(Y)\t", $Y_RCFV, "\ncsRCFV(D)\t", $D_RCFV, "\ncsRCFV(E)\t", $E_RCFV, "\ncsRCFV(K)\t", $K_RCFV, "\ncsRCFV(R)\t", $R_RCFV, "\ncsRCFV(H)\t", $H_RCFV, "\n";
 print NCSRCFV_OUT "character nRCFV values:\nncsRCFV(A)\t", $A_RCFV/(($Length[0]**-0.5)*100), "\nncsRCFV(V)\t", $V_RCFV/(($Length[0]**-0.5)*100), "\nncsRCFV(L)\t", $L_RCFV/(($Length[0]**-0.5)*100), 
 "\nncsRCFV(I)\t", $I_RCFV/(($Length[0]**-0.5)*100), "\nncsRCFV(P)\t", $P_RCFV/(($Length[0]**-0.5)*100), "\nncsRCFV(M)\t", $M_RCFV/(($Length[0]**-0.5)*100), "\nncsRCFV(F)\t", $F_RCFV/(($Length[0]**-0.5)*100), 
 "\nncsRCFV(W)\t", $W_RCFV/(($Length[0]**-0.5)*100), "\nncsRCFV(G)\t", $G_RCFV/(($Length[0]**-0.5)*100), "\nncsRCFV(S)\t", $S_RCFV/(($Length[0]**-0.5)*100), "\nncsRCFV(T)\t", $T_RCFV/(($Length[0]**-0.5)*100), 
