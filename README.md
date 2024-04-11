@@ -148,7 +148,7 @@ The Narrative report will also suggest potential next steps, such as data recodi
 It's the part we're most excited about, but also the part that needs the most fine-tuning, so if you have any suggestions for extra details you'd like to see, do get in touch through the GitHub!
 
 
-# The BOSTIn playlist
+# A Very Minor Note: The BOSTIn playlist
 As a minor note, as with all my software and research projects, I've attached a playlist as a subset of what I was listening to at the time! BOSTIn is inspired by my hometown, Birmingham, and was written over the Norwegian winter, so I really plumbed back into some good Brummie bands, a lot of stuff from my nostalgic teenager-hood!
 
 https://www.youtube.com/playlist?list=PLhvDtI0qOMjnn18Ap5gnIk-lDFe1nj4hx
