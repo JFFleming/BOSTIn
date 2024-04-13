@@ -43,15 +43,15 @@ foreach my $key (keys %taxaHash){
 	if ($taxaHash{$key} > $bigsd2){
 		push (@redFlag, $key);
 		}
-	if ($taxaHash{$key} < $smallsd2){
-		push (@redFlag, $key);
-		}
+#	if ($taxaHash{$key} < $smallsd2){
+#		push (@redFlag, $key);
+#		}
 	if ($taxaHash{$key} > $stats{UpperQuartile}){
 		push (@yellowFlag, $key);
 	}
-	if ($taxaHash{$key} < $stats{LowerQuartile}){
-		push (@yellowFlag, $key);
-	}
+#	if ($taxaHash{$key} < $stats{LowerQuartile}){
+#		push (@yellowFlag, $key);
+#	}
 }
 open (yellowFile, '>', $LBYellow);
 open (redFile, '>', $LBRed);
