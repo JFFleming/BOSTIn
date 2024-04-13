@@ -34,7 +34,7 @@ close($taxFile);
 my @yellowFlag;
 my @redFlag;
 my $bigsd2 = $stats{Mean}+(2*$stats{standardDeviation});
-my $smallsd2 = $stats{Mean}-(2*$stats{standardDeviation}); 
+#my $smallsd2 = $stats{Mean}-(2*$stats{standardDeviation}); 
 #print $bigsd2, "\n";
 #print $smallsd2, "\n";
 
