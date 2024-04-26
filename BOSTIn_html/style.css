@@ -1,0 +1,111 @@
+
+* {
+    font-family: Deja Vu;
+    font-size: 16px;
+    margin: 0px;
+    padding: 0px;
+}
+
+p {
+    margin: 10px;
+}
+
+.contentdiv {
+    margin: 10px;
+    margin: 0 auto;
+    width: 750px;
+}
+
+.contentdiv ol {
+    margin-left: 35px;
+}
+
+.contentdiv h1 {
+    font-size: 34px;
+    margin: 10px 5px 20px 5px;
+}
+
+.contentdiv h2 {
+    font-size: 30px;
+    margin: 10px 5px 20px 5px;
+}
+.contentdiv h5 {
+    font-size: 19px;
+    margin: 10px 5px 20px 5px;
+}
+.contentdiv table {
+    margin: 5px;
+}
+.contentdiv table .option {
+    font-weight: bold;
+}
+.contentdiv table .option a {
+    color: blue;
+    text-decoration: underline;
+}
+.contentdiv table .description {
+    font-style: italic;
+}
+.contentdiv .middle {
+    display: block;
+    text-align: center;
+}
+.contentdiv button {
+    width: 250px;
+}
+
+.contentdiv .navigation {
+    margin-bottom: 15px;
+    display: block;
+    text-align: center;
+}
+.contentdiv .navigation a {
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.faq {
+    margin-bottom: 25px;
+}
+.faqs .question {
+    font-weight: bold;
+    font-size: 19px;    
+    margin-bottom: 10px;
+}
+.faqs .answer {
+    margin-bottom: 20px;
+}
+
+.box {
+    color: black;
+    background-color: #EEEEEE;
+    border: 1.5px solid grey;
+    z-index: 10;
+    position: relative;
+    width: 200px;
+    height: 200px;
+    overflow: auto;
+    margin: 10px;
+    padding: 10px;
+    font-size: 16px;
+    box-shadow: 0 10px 10px 2px rgba(0,0,0,0.3);
+    border-radius: 4px;
+    float: left;
+}
+.box .logo {
+    margin: 0 auto;
+    width: 100px;
+    margin-top: 7px;
+}
+.box .title {
+    font-size: 17px;
+    font-weight: bold;
+    margin: 3px;
+    margin-top: 8px;
+}
+.box .description {
+    position: absolute;
+    font-size: 15px;
+    color: #434343;
+    margin: 3px;
+}
