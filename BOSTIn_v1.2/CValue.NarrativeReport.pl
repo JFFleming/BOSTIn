@@ -2,14 +2,16 @@
 use strict;
 use warnings;
 my $prefix = $ARGV[0];
+#grasp output prefix, use it to find the downstream inputs and make outputs.
 my $summInput = "$prefix.SiteSaturation.TotalCValue.txt";
 open(my $summFile, '<', $summInput);
+#open the C Value Calculator output
 my $fulldummy = <$summFile>;
 
 my $totalC;
 my $TIStdDev;
 my $PStdDev;
-
+#Read the Calculator output to extract the CFactor, Ti/Tv Standard Deviation and the PDist Standard deviation.
 while(<$summFile>){
 	my $summline = $_;
 	chomp($summline);
@@ -34,6 +36,7 @@ else{
 	print "As the C Factor is below 10, this means that saturation might be a serious problem in this dataset. Check the taxa C Factors to see which taxa are contributing to this.\n";
 }
 
+#Read the R Summary file, using the subroutine, to extract the taxa-specific statistics and place them in the t_summary array.
 my $t_summary = "$prefix.SiteSaturation.TaxaCValue.summary.txt";
 my @t_stats = summaryStats($t_summary);
 
@@ -47,6 +50,7 @@ my $tC_highsig = $tC_mean+(2*$tC_sd);
 
 #print "$tC_mean $tC_median $tC_sd";
 
+#Read the Red and Yellow flag files to place the taxa in the narrative report.
 my $red_tfile = "$prefix.SiteSaturation.TaxaCValue.redflags.txt";
 my @tC_red = redLorryYellow($red_tfile);
 
@@ -69,6 +73,7 @@ print "From here, we can identify those potentially problematic sequences, assig
 	@tC_yellow
 ";
 
+#This subroutine read the R Output summary file
 sub summaryStats {
 	open (my $input, '<', $_[0]);
 	my @summary;
@@ -86,6 +91,7 @@ sub summaryStats {
 	close($input);
 }
 
+#This subroutine reads the red and yellow flags from the R output.
 sub redLorryYellow {
 	open(my $input, '<', $_[0]);
 	my @lorries;
