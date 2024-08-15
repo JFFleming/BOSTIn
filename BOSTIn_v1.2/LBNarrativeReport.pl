@@ -2,11 +2,13 @@
 use strict;
 use warnings;
 
+#Open Input Files
 my $LBScoreSummary = "$ARGV[0].LBSummary.txt";
 my $LBTaxa = "$ARGV[0].LBi-scores";
 my $LBYellow = "$ARGV[0].LBScore.Taxa.yellowflags.txt";
 my $LBRed = "$ARGV[0].LBScore.Taxa.redflags.txt";
 
+#Open Whole dataset summary file and extract overall LB Score
 open (my $summFile, '<', $LBScoreSummary);
 my %stats;
 while(<$summFile>){
@@ -18,6 +20,7 @@ while(<$summFile>){
 }
 close($summFile);
 
+#Open taxa specific summary file and extract taxa specific scores
 open (my $taxFile, '<', $LBTaxa);
 
 my %taxaHash;
@@ -31,25 +34,24 @@ while(<$taxFile>){
 }
 close($taxFile);
 
+#Calculate Red Flag and Yellow Flag taxa
 my @yellowFlag;
 my @redFlag;
-my $bigsd2 = $stats{Mean}+(2*$stats{standardDeviation});
-my $smallsd2 = $stats{Mean}-(2*$stats{standardDeviation}); 
+#my $bigsd2 = $stats{Mean}+(2*$stats{standardDeviation});
+#my $smallsd2 = $stats{Mean}-(2*$stats{standardDeviation});
+my $UQ = $stats{UpperQuartile};
+my $UQStdDev = $stats {stdDevUpperQuartile};
+my $UQBound1 = $UQ+$UQStdDev;
+my $UQBound2 = $UQ+(2*$UQStdDev);
 #print $bigsd2, "\n";
 #print $smallsd2, "\n";
 
 foreach my $key (keys %taxaHash){
 #	print $taxaHash{$key}, "\n";
-	if ($taxaHash{$key} > $bigsd2){
+	if ($taxaHash{$key} > $UQBound2){
 		push (@redFlag, $key);
 		}
-	if ($taxaHash{$key} < $smallsd2){
-		push (@redFlag, $key);
-		}
-	if ($taxaHash{$key} > $stats{UpperQuartile}){
-		push (@yellowFlag, $key);
-	}
-	if ($taxaHash{$key} < $stats{LowerQuartile}){
+	if ($taxaHash{$key} > $UQBound1){
 		push (@yellowFlag, $key);
 	}
 }
@@ -70,11 +72,11 @@ print "LB Score
 	For the purposes of defining the sextile of taxa most likely to cause a long branch attraction artifact, however, it ought to suffice. To read more about this, see the BOSTIn manuscript when it appears in pre-print (I'll add a reference here later!)
 	The taxa specific LB-Scores in your dataset range from $stats{Minimum} to $stats{Maximum} , with a mean of $stats{Mean} and a standard deviation of $stats{standardDeviation} . 
 	
-	Typically, LB-Scores identify suspect long-branched taxa by assessing which taxa are outside of two standard deviations of the mean, and then those that are in the upper quartile. If you are selecting genes, those with the smallest standard deviations should be preferred, as heterogeneity, rather than the existence of long branches themselves, are one of the main causes of topological artifacts.
+	Typically, LB-Scores identify suspect long-branched taxa by assessing which taxa are outside of one, and then two standard deviations of the mean of the Upper Quartile. This is because it is the extremes of Branch Length heterogeneity that can cause the greatest problems.
 	Your Upper Quartile starts at $stats{UpperQuartile}, with your Lower Quartile at $stats{LowerQuartile}.
 	We've identified these as yellow flags and red flags respectively, as with the other measurements in BOSTIn.
 	Your Red Flag Taxa are:
 	@redFlag
 	Your Yellow Flag Taxa are:
 	@yellowFlag
-";
+";	
