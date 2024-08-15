@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+
+#Take the output Prefix as the command line argument to parse downstream inputs and make outputs.
 my $prefix = $ARGV[0];
 my $summInput = "$prefix.SiteSaturation.TotalFrequencies.txt";
 open(my $summFile, '<', $summInput);
@@ -8,7 +10,7 @@ my $fulldummy = <$summFile>;
 
 my $totalDE;
 my $TIFreq;
-
+#Read the Summary file produced by the DE Score calculator and extract the relevant output values.
 while(<$summFile>){
 	my $summline = $_;
 	chomp($summline);
@@ -31,7 +33,7 @@ elsif ($totalDE > 0.3){
 else{
 	print "As the DE-Score is below 0.3, this means that saturation might be a serious problem in this dataset. Check the tDE-Scores to see which taxa are contributing to this.\n";
 }
-
+#Open the R Summary file and extract the relevant taxon specific files from the R Summary output.
 my $t_summary = "$prefix.SiteSaturation.TaxaFrequencies.summary.txt";
 my @t_stats = summaryStats($t_summary);
 
@@ -41,6 +43,7 @@ my $tDE_sd = $t_stats[2];
 my $tDE_lowsig = $tDE_mean-(2*$tDE_sd);
 my $tDE_highsig = $tDE_mean+(2*$tDE_sd);
 
+#Use the Red Lorry Yellow Lorry subroutine to extract the Red Flag and Yellow Flag taxa from the txt files produced by the R script.
 my $red_tfile = "$prefix.SiteSaturation.TaxaFrequencies.SiteSat.Taxa.redflags.txt";
 my @tDE_red = redLorryYellow($red_tfile);
 
