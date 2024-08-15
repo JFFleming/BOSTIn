@@ -1,5 +1,6 @@
 #!/usr/local/bin/Rscript
 args <- commandArgs(trailingOnly = TRUE)
+#Take Command Line Arguments. Read the table in the supplied file and make the histogram of the table.
 t_filename <- args[1]
 tCdata <- read.table(t_filename, skip=1)
 t_pdf <- paste0(tools::file_path_sans_ext(t_filename),".histogram.pdf")
@@ -7,6 +8,7 @@ pdf(file = t_pdf, width=4, height=4)
 hist(tCdata$V4, main="Histogram of taxa C-Factor Score values", xlab="taxa C-Factor Score Values")
 dev.off()
 
+#Now do the useful statistics - First Mean, then median, then standard deviation, median absolute devitation, and percentage with a CFactor equal to or greater than 20, then 10.
 t_summ_file <- paste0(tools::file_path_sans_ext(t_filename),".summary.txt")
 t_summ_list <- c()
 t_summ_list <- append(t_summ_list, "taxa C-Factor summary statistics\n")
@@ -26,7 +28,7 @@ t_cent10 = (length(tCdata$V4[tCdata$V4>=10])/length(tCdata$V4))*100
 t_summ_list <- append(t_summ_list, paste("Percentage C-Factor >=10\t", t_cent10, "\n"))
 cat(t_summ_list, file=t_summ_file)
 
-
+#Print names of taxa, alongside their C Factors, with a C Factor of less than 10 to the red flags file.
 redfile <- paste0(tools::file_path_sans_ext(t_filename),".redflags.txt")
 t_RedFlags<-file(redfile)
 redList <- c()
@@ -38,6 +40,7 @@ for(i in 1:length(tCdata$V4)){
 }
 cat(redList, file=t_RedFlags)
 
+#Print names of taxa, alongside their C Factors, with a C Factor of less than 20 to the yellow flags file.
 yellowfile <- paste0(tools::file_path_sans_ext(t_filename),".yellowflags.txt")
 t_YellowFlags<-file(yellowfile)
 yellowList <- c()
