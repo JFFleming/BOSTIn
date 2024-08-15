@@ -1,4 +1,5 @@
 #!/usr/local/bin/Rscript
+#Take as input the tRCFV file from RCFV Reader
 args <- commandArgs(trailingOnly = TRUE)
 t_filename <- args[1]
 tRCFVdata <- read.table(t_filename, skip=1)
@@ -7,6 +8,7 @@ pdf(file = t_pdf, width=4, height=4)
 hist(tRCFVdata$V2, main="Histogram of ntsRCFV values", xlab="ntsRCFV Values")
 dev.off()
 
+#Calculate mean, median, standard deviation and median absolute deviation
 t_summ_file <- paste0(tools::file_path_sans_ext(t_filename),".summary.txt")
 t_summ_list <- c()
 t_summ_list <- append(t_summ_list, "ntsRCFV summary statistics\n")
@@ -20,6 +22,7 @@ t_mad = mad(tRCFVdata$V2)
 t_summ_list <- append(t_summ_list, paste("median absolute deviation\t", t_mad, "\n"))
 cat(t_summ_list, file=t_summ_file)
 
+#Identify yellow flag taxa - those more than 2 MAD from the median
 yellowfile <- paste0(tools::file_path_sans_ext(t_filename),".CompHet.Taxa.yellowflags.txt")
 t_YellowFlags<-file(yellowfile)
 yellowList <- c()
@@ -31,6 +34,7 @@ for(i in 1:length(tRCFVdata$V2)){
 }
 cat(yellowList, file=t_YellowFlags)
 
+#Identify red flag taxa - those more than 2 SD from the median
 redfile <- paste0(tools::file_path_sans_ext(t_filename),".CompHet.Taxa.redflags.txt")
 t_RedFlags<-file(redfile)
 redList <- c()
@@ -42,6 +46,7 @@ for(i in 1:length(tRCFVdata$V2)){
 }
 cat(redList, file=t_RedFlags)
 
+#Find and open the character specific output from RCFV reader
 c_filename <- args[2]
 cRCFVdata <- read.table(c_filename, skip=1)
 c_pdf <- paste0(tools::file_path_sans_ext(c_filename),".histogram.pdf")
@@ -49,6 +54,7 @@ pdf(file = c_pdf, width=4, height=4)
 hist(cRCFVdata$V2, main="Histogram of ncsRCFV values", xlab="ncsRCFV Values")
 dev.off()
 
+#Calculate mean, median, standard deviation and median absolute deviation
 c_summ_file <- paste0(tools::file_path_sans_ext(c_filename),".summary.txt")
 c_summ_list <- c()
 c_summ_list <- append(c_summ_list, "ncsRCFV summary statistics\n")
@@ -62,6 +68,7 @@ c_mad = mad(cRCFVdata$V2)
 c_summ_list <- append(c_summ_list, paste("median absolute deviation\t", c_mad, "\n"))
 cat(c_summ_list, file=c_summ_file)
 
+#Identify yellow flag taxa - those more than 2 MAD from the median
 c_yellowfile <- paste0(tools::file_path_sans_ext(c_filename),".CompHet.Character.yellowflags.txt")
 c_YellowFlags<-file(c_yellowfile)
 c_yellowList <- c()
@@ -73,6 +80,7 @@ for(i in 1:length(cRCFVdata$V2)){
 }
 cat(c_yellowList, file=c_YellowFlags)
 
+#Identify red flag taxa - those more than 2 SD from the median
 redfile <- paste0(tools::file_path_sans_ext(c_filename),".CompHet.Character.redflags.txt")
 c_RedFlags<-file(redfile)
 redList <- c()
