@@ -126,7 +126,8 @@ foreach my $k (keys %PhySeqs){
 	my $TaxStdTransI = get_stddev(\@TaxTis);
 	my $TaxStdTransV = get_stddev(\@TaxTvs);
 	my $TaxStdTiFreq =  get_stddev(\@TaxTiFreqs);
-	my $TaxDE = $TaxAverageTiFreq/($size**-0.08);
+	my $TaxDist = $TaxAverageTiFreq - 0.177;
+	my $TaxDE = $TaxDist/(0.255*$size**-0.15);
 #	print "\nLOOP $k OVER \n";
 	print TAXA "$k\t$TaxAverageTiFreq\t$TaxStdTiFreq\t$TaxDE\n";
 #	print "$k => @vals \n";
@@ -140,7 +141,8 @@ my $AverageTiFreq = avg(\@AllTiFreqs);
 my $StdTransI = get_stddev(\@AllTis);
 my $StdTransV = get_stddev(\@AllTvs);
 my $StdTiFreq =  get_stddev(\@AllTiFreqs);
-my $totalDE = $AverageTiFreq/($size**-0.08);
+my $FreqDist = $AverageTiFreq - 0.177;
+my $totalDE = $FreqDist/(0.255*$size**-0.15);
 
 print FREQ "$ARGV[0]\t$AverageTiFreq\t$StdTiFreq\t$totalDE\n";
 
