@@ -8,8 +8,39 @@ at_out <- args[3]
 a_out <-args[4]
 d_type <- args[5]
 Fasta=read.phyDat(a_file, format = "fasta", type = d_type)
+
+fix_negative_edge_length <- function(nj.tree) {
+  edge_infos <- data.frame(
+    from = nj.tree$edge[, 1],
+    to = nj.tree$edge[, 2],
+    length = nj.tree$edge.length
+  )
+
+  # Find 'from' nodes that have negative edge lengths
+  nega_froms <- unique(edge_infos$from[edge_infos$length < 0])
+
+  for (nega_from in nega_froms) {
+    # Find the most negative edge length from this 'from' node
+    lengths_from_node <- edge_infos$length[edge_infos$from == nega_from]
+    minus_length <- lengths_from_node[order(lengths_from_node)][1]
+
+    # Adjust lengths of all edges going *from* this node
+    edge_infos$length[edge_infos$from == nega_from] <- 
+      edge_infos$length[edge_infos$from == nega_from] - minus_length
+
+    # Adjust the edge going *to* this node
+    edge_infos$length[edge_infos$to == nega_from] <- 
+      edge_infos$length[edge_infos$to == nega_from] + minus_length
+  }
+
+  # Update the tree with the corrected edge lengths
+  nj.tree$edge.length <- edge_infos$length
+  return(nj.tree)
+}
+
 DistMatrix <- dist.ml(Fasta)
 treeNJ <- NJ(DistMatrix)
+treeNJ <- fix_negative_edge_length(treeNJ)
 write.tree(treeNJ, file=a_tree)
 
 dist.mat = cophenetic.phylo(treeNJ)
