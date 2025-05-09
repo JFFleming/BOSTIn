@@ -2,41 +2,35 @@
 use strict;
 use warnings;
 my $prefix = $ARGV[0];
-#grasp output prefix, use it to find the downstream inputs and make outputs.
 my $summInput = "$prefix.SiteSaturation.TotalCValue.txt";
 open(my $summFile, '<', $summInput);
-#open the C Value Calculator output
 my $fulldummy = <$summFile>;
 
-my $totalC;
-my $TIStdDev;
-my $PStdDev;
-#Read the Calculator output to extract the CFactor, Ti/Tv Standard Deviation and the PDist Standard deviation.
+my %stats;
+
 while(<$summFile>){
-	my $summline = $_;
-	chomp($summline);
-	my @splitter = split(/\t/, $summline);
-	$totalC = $splitter[3];
-	$TIStdDev = $splitter[1];
-	$PStdDev = $splitter[2];
+	my $line = $_;
+	chomp($line);
+	my @splitter = split("\t", $line);
+	my $statValue = $splitter[1];
+	$stats{$splitter[0]} = $statValue;
 }
 close($summFile);
 
 print "C Factor
-	As you are using amino acid data, we selected the C Factor - the Convergence Factor. This is based on the ratio of the standard deviation of the Transition/Transversion ratio of the dataset and the standard deviation of the uncorrected p-distance. It also has the advantage that it can be used to detect taxa that are particularly saturated. We call this the taxon C Factor.
-	The C Factor of this entire dataset is $totalC, where the standard deviation of the transition transversion ratios is $TIStdDev and the standard deviation of the uncorrected p-distances i $PStdDev.";
+	As you are using nucleotide data, we selected the C Factor - the Convergence Factor. This is based on the ratio of the standard deviation of the Transition/Transversion ratio of the dataset and the standard deviation of the uncorrected p-distance. It also has the advantage that it can be used to detect taxa that are particularly saturated. We call this the taxon C Factor.
+	The C Factor of this entire dataset is $stats{CValue}, where the standard deviation of the transition transversion ratios is $stats{StdDevTiTv} and the standard deviation of the uncorrected p-distances is $stats{PValue}.";
 
-if ($totalC > 20){
+if ($stats{CValue} > 20){
  print "As the C Factor is greater than 20, this means that saturation is unlikely to be a problem with this dataset, as the Observed and Expected Ti/Tv ratio is likely greater than 1 (Struck et al 2008).\n";
 }
-elsif ($totalC > 10){
+elsif ($stats{CValue} > 10){
 	print "As the C Factor is between 10 and 20, it means that this dataset is not entirely saturated, but that saturation might affect topological reconstruction. As it is still quite low, you might want to observe the distribution of the taxa C Factors, to see if any taxa are contributing particularly to the overall score.\n";
 }
 else{
 	print "As the C Factor is below 10, this means that saturation might be a serious problem in this dataset. Check the taxa C Factors to see which taxa are contributing to this.\n";
 }
 
-#Read the R Summary file, using the subroutine, to extract the taxa-specific statistics and place them in the t_summary array.
 my $t_summary = "$prefix.SiteSaturation.TaxaCValue.summary.txt";
 my @t_stats = summaryStats($t_summary);
 
@@ -50,7 +44,6 @@ my $tC_highsig = $tC_mean+(2*$tC_sd);
 
 #print "$tC_mean $tC_median $tC_sd";
 
-#Read the Red and Yellow flag files to place the taxa in the narrative report.
 my $red_tfile = "$prefix.SiteSaturation.TaxaCValue.redflags.txt";
 my @tC_red = redLorryYellow($red_tfile);
 
@@ -73,7 +66,6 @@ print "From here, we can identify those potentially problematic sequences, assig
 	@tC_yellow
 ";
 
-#This subroutine read the R Output summary file
 sub summaryStats {
 	open (my $input, '<', $_[0]);
 	my @summary;
@@ -91,7 +83,6 @@ sub summaryStats {
 	close($input);
 }
 
-#This subroutine reads the red and yellow flags from the R output.
 sub redLorryYellow {
 	open(my $input, '<', $_[0]);
 	my @lorries;
