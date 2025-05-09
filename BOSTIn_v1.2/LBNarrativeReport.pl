@@ -22,6 +22,7 @@ open (my $taxFile, '<', $LBTaxa);
 
 my %taxaHash;
 my $dummy = <$taxFile>;
+
 while(<$taxFile>){
 	my $taxline = $_;
 	chomp($taxline);
