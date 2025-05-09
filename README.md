@@ -148,6 +148,61 @@ The Narrative report will also suggest potential next steps, such as data recodi
 It's the part we're most excited about, but also the part that needs the most fine-tuning, so if you have any suggestions for extra details you'd like to see, do get in touch through the GitHub!
 
 
+# Gene-Wise: A New Way To Use BOSTIn
+# Introduction
+Gene-Wise presents an alternative way to use BOSTIn for multiple gene datasets. Gene-Wise is a script, written in bash, that acts as a way to easily automate multiple BOSTIn analyses in order to efficiently analyse multiple genes in a single batch. Then, it outputs a series of files for each BOSTIn metric selected that analyses the genes in the context of one another, helping you pick the most sensible genes for your next multi-gene alignment dataset.
+
+# Installing Gene-Wise BOSTIn
+Once BOSTIn is installed, following the instructions above, install Gene-Wise BOSTIn using the same process.
+
+In your home directory (~/), you will find a file called either .bashrc or .bash_profile. Add this line to the bottom of that file.
+```
+export PATH=$PATH:<pwd address>/BOSTIn_v1_0/GeneWise
+```
+This makes sure that the next time you open your terminal, it registers the BOSTIn directory as a place to look for executables.
+Finally, go inside the GeneWise directory, with all the scripts, and run the following command:
+```
+chmod u+x+r *
+```
+This elevates these files to make sure they can do what you need them to do. If you are on a Mac, you might also need to run this
+```
+xattr -d com.apple.quarantine *
+```
+Which removes the "quarantine" status from the software package - basically telling your mac it isn't harmful.
+
+Then, you should be ready to go! 
+
+# Using Gene-Wise BOSTIn
+BOSTIn Genewise uses the same format as BOSTIn, with the same three options - --blh for branch length heterogeneity, --s for site saturation and --ch for compositional heterogeneity.
+Following those options, type dna or protein based on the dataset you want to analyse, then the name of a file containing a list of fasta files you would like to analyse, with one file on each line.
+Finally, type the name of the output prefix that you would like for each of the Gene-Wise analyses. This won't affect the names of the individual per-gene analyses (they will use to the name of the input fasta file), but it will give a unique prefix to the output files that analyse the whole dataset.
+
+Bostin.GeneWise.sh [--blh] [--s] [--ch] <dna or protein> <list of fasta files> <genewise output prefix>"
+
+# Results from Gene-Wise BOSTIn
+In addition to the regular BOSTIn results files, Gene-Wise BOSTIn will produce a number of unique output files:
+
+# Branch Length Heterogeneity
+\<prefix\>.LBScore.fastaSummary.txt - This file is a compilation of the whole dataset standard deviations of the LBi-Scores for each gene in your input list
+\<prefix\>.LBScore.fastaSummary.histogram.pdf - This is a histogram of the standard deviations of the LBi-Scores of each gene in your input list
+\<prefix\>.LBScore.fastaSummary.BranchLength.GeneWise.redflags - This is a list of the genes identified as red flags for branch length heterogeneity based on the LB-Score
+\<prefix\>.LBScore.fastaSummary.BranchLength.GeneWise.yellowflags - This is a list of the genes identified as yellow flags for branch length heterogeneity based on the LB-Score
+\<prefix\>.LBScore.fastaSummary.NarrativeSummary.txt - This is the narrative summary explaining the distribution of branch length heterogeneity across the dataset.
+
+# Compositional Heteogeneity
+\<prefix\>.nRCFV.fastaSummary.txt  - This file is a compilation of the whole dataset nRCFVs for each gene in your input list
+\<prefix\>.nRCFV.fastaSummary.histogram.pdf - This is a histogram of the nRCFVs of each gene in your input list
+\<prefix\>.nRCFV.fastaSummary.CompHet.GeneWise.redflags.txt - This is a list of the genes identified as red flags for compositional heterogeneity based on their nRCFV
+\<prefix\>.nRCFV.fastaSummary.CompHet.GeneWise.yellowflags.txt - This is a list of the genes identified as yellow flags for compositional heterogeneity based on their nRCFV
+\<prefix\>.nRCFV.fastaSummary.CompHet.NarrativeSummary.txt  - This is the narrative summary explaining the distribution of compositional heterogeneity across the dataset.
+
+# Site Saturation
+\<prefix\>.\<DEScore or CScore\>.fastaSummary.txt - This file is a compilation of the whole dataset DE-Score or C-Score for each gene in your input list
+\<prefix\>.\<DEScore or CScore\>.fastaSummary.histogram.pdf - This is a histogram of the DE-Scores or C-Scores of each gene in your input list
+\<prefix\>.\<DEScore or CScore\>.fastaSummary.SiteSaturation.GeneWise.redflags.txt - This is a list of the genes identified as red flags for site saturation based on either the DE-Score or the C-Score
+\<prefix\>.\<DEScore or CScore\>.fastaSummary.SiteSaturation.GeneWise.yellowflags.txt  - This is a list of the genes identified as yellow flags for site saturation based on either the DE-Score or the C-Score
+\<prefix\>.\<DEScore or CScore\>.fastaSummary.SiteSaturation.NarrativeSummary.txt - This is the narrative summary explaining the distribution of saturation across the dataset.
+
 # A Very Minor Note: The BOSTIn playlist
 As a minor note, as with all my software and research projects, I've attached a playlist as a subset of what I was listening to at the time! BOSTIn is inspired by my hometown, Birmingham, and was written over the Norwegian winter, so I really plumbed back into some good Brummie bands, a lot of stuff from my nostalgic teenager-hood!
 
