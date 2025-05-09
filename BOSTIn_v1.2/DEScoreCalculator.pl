@@ -9,7 +9,7 @@ my $freq_file = "$ARGV[1].SiteSaturation.TotalFrequencies.txt";
 my $tax_file = "$ARGV[1].SiteSaturation.TaxaFrequencies.txt";
 
 open (FREQ, '>', $freq_file) || die ("Can not open $freq_file\n");
-print FREQ "FileName\tExchangeFreq\tExchangeFreqStDev\tDE-Score\n";
+print FREQ "Summary of the DE-Score Analysis\n";
 open (TAXA, '>', $tax_file) || die ("Can not open $tax_file\n");
 print TAXA "FileName\tExchangeFreq\tExchangeFreqStDev\tDE-Score\n";
 my @all_seqs = ();
@@ -19,6 +19,7 @@ my @basic= ("H","K","R");
 my @hydrophobic= ("I","L","V","M");
 my @aromatic= ("F","W","Y");
 my @sulfur= ("C");
+my @valid_seqs= ("A","G","P","S","T","D","E","N","Q","H","K","R","I","L","V","M","F","W","Y","C");
 
 # Create hashes for fast lookup of each category
 my %small = map { $_ => 1 } @small;
@@ -27,7 +28,7 @@ my %basic = map { $_ => 1 } @basic;
 my %hydrophobic = map { $_ => 1 } @hydrophobic;
 my %aromatic = map { $_ => 1 } @aromatic;
 my %sulfur = map { $_ => 1 } @sulfur;
-
+my %valids = map { $_ => 1 } @valid_seqs;
 my %phy_seqs;
 
 print "
@@ -83,7 +84,7 @@ foreach my $k (keys %phy_seqs){
         foreach (@vals){
             my $query = $_;
             my $comp_query = $comp_vals[$i];
-            
+            if ($valids{$query} && $valids{$comp_query}){
             if ($query eq "-" || $comp_query eq "-"){
                 $gap_counter++;
             }
@@ -112,9 +113,11 @@ foreach my $k (keys %phy_seqs){
             else{
                 $pairwise_tv++;
             }
+            }
             $i++;
         }
         $b++;
+
         if ($pairwise_ti == 0 && $pairwise_tv == 0) {
             $gap_counter++;
         }
@@ -153,7 +156,7 @@ my $std_ti_freq =  get_stddev(\@all_ti_freqs);
 my $freq_dist = $average_ti_freq - 0.177;
 my $total_DE = $freq_dist/(0.255*$size**-0.15);
 
-print FREQ "$ARGV[0]\t$average_ti_freq\t$std_ti_freq\t$total_DE\n";
+print FREQ "Dayhoff Category Exchange Frequency:\t$average_ti_freq\nExchange Frequency Standard Deviation:\t$std_ti_freq\nDE-Score:\t$total_DE\n";
 
 ### These are the mathematics subroutines for averages, standard deviations and disparity ###
 sub avg {
