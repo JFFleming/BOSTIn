@@ -4,14 +4,14 @@ use warnings;
 use FAST::Bio::SeqIO;
 
 #Read the Fasta file
-my $alignFile = FAST::Bio::SeqIO->new(-file => $ARGV[0], -format => 'Fasta', -alphabet => $ARGV[2]);
-my $FreqFile = "$ARGV[1].SiteSaturation.TotalCValue.txt";
-my $TaxFile = "$ARGV[1].SiteSaturation.TaxaCValue.txt";
+my $alignFile = FAST::Bio::SeqIO->new(-file => $ARGV[0], -format => 'Fasta', -alphabet => 'dna');
+my $FreqFile = "$ARGV[1].SiteSaturation.TotalCScore.txt";
+my $TaxFile = "$ARGV[1].SiteSaturation.TaxaCScore.txt";
 #Open output files for writing.
 open (FREQ, '>', $FreqFile) || die ("Can not open $FreqFile\n");
 
 open (TAXA, '>', $TaxFile) || die ("Can not open $TaxFile\n");
-print TAXA "FileName\tTransitionFreq\tTiTv\tTaxonPValue\tCValue\n";
+print TAXA "FileName\tTiTv\tTaxonPValue\tCScore\n";
 #Set Purines and Pyrimidines to measure TiTv
 my @AllSeqs = ();
 my @Pyramidine = ("T","C");
@@ -107,15 +107,15 @@ foreach my $k (keys %PhySeqs){
 	$a++;
 	my $TaxStdTiTv = get_stddev(\@TaxTiTv);
 	my $TaxPValue = get_stddev(\@TaxPDists);
-	my $TaxCValue = $TaxStdTiTv/$TaxPValue;
+	my $TaxCScore = $TaxStdTiTv/$TaxPValue;
 	print "\n Finished assessing $k. Taxon $a of $size \n";
-	print TAXA "$k\t$TaxStdTiTv\t$TaxPValue\t$TaxCValue\n";
+	print TAXA "$k\t$TaxStdTiTv\t$TaxPValue\t$TaxCScore\n";
 }
 my $StdTiTv = get_stddev(\@AllTiTv);
 my $PValue = get_stddev(\@AllPDists);
-my $CValue = $StdTiTv/$PValue;
+my $CScore = $StdTiTv/$PValue;
 
-print FREQ "$ARGV[0] CScore Summary\nStdDevTiTv\t$StdTiTv\nPValue\t$PValue\nCValue\t$CValue\n";
+print FREQ "$ARGV[0] C-Score Summary\nStdDevTiTv\t$StdTiTv\nPValue\t$PValue\nCScore\t$CScore\n";
 
 sub avg {
   my ($avg_array_ref) = @_;
