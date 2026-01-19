@@ -1,38 +1,11 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use FAST::Bio::SeqIO;
-my $align_check = $ARGV[0] or die "No Alignment File Provided \n";
-my $output_check = $ARGV[1] or die "No Output Prefix provided \n";
-my $align_file = FAST::Bio::SeqIO->new(-file => $ARGV[0], -format => 'Fasta', -alphabet => 'protein');
-my $freq_file = "$ARGV[1].SiteSaturation.TotalFrequencies.txt";
-my $tax_file = "$ARGV[1].SiteSaturation.TaxaFrequencies.txt";
 
-open (FREQ, '>', $freq_file) || die ("Can not open $freq_file\n");
-print FREQ "Summary of the DE-Score Analysis\n";
-open (TAXA, '>', $tax_file) || die ("Can not open $tax_file\n");
-print TAXA "FileName\tExchangeFreq\tExchangeFreqStDev\tDE-Score\n";
-my @all_seqs = ();
-my @small= ("A","G","P","S","T");
-my @acid_amide= ("D","E","N","Q");
-my @basic= ("H","K","R");
-my @hydrophobic= ("I","L","V","M");
-my @aromatic= ("F","W","Y");
-my @sulfur= ("C");
-my @valid_seqs= ("A","G","P","S","T","D","E","N","Q","H","K","R","I","L","V","M","F","W","Y","C");
-
-# Create hashes for fast lookup of each category
-my %small = map { $_ => 1 } @small;
-my %acid_amide = map { $_ => 1 } @acid_amide;
-my %basic = map { $_ => 1 } @basic;
-my %hydrophobic = map { $_ => 1 } @hydrophobic;
-my %aromatic = map { $_ => 1 } @aromatic;
-my %sulfur = map { $_ => 1 } @sulfur;
-my %valids = map { $_ => 1 } @valid_seqs;
-my %phy_seqs;
+my $version   = "1.6";
 
 print "
-DE-Score Calculator, James F. Fleming and Torsten H. Struck, 2024.
+DE-Score Calculator Version $version, James F. Fleming and Torsten H. Struck, 2025.
 Welcome to the DE-Score Calculator. DE-Score Calculator accepts amino acid FASTA files as input, and then outputs 2 files.
 To run DE-Score Calculator on your data, use the following command:
 perl DEScoreCalculator.pl <filename> <prefix for output files>
@@ -42,155 +15,198 @@ The 2 output files are:
 - <prefix for output files>.SiteSaturation.TotalFrequencies.txt: This file gives the Within Category/Between Category exchange frequency, the standard deviation of that frequency and the DE-Score for the whole dataset.
 
 If you have any questions, queries or comments, please don't hesitate to get in touch at:
-jfleming\@jamstec.go.jp
+j.fleming\@ub.edu
 ";
-if($ARGV[0]=""||$ARGV[1]=""){
-    print "Are you sure you formatted your input correctly? Check the description above to be sure.";
-}
 
-### This reads the Fasta file in ###
-while ( my $seq = $align_file->next_seq() ) {
-    my $id = $seq->display_id;
-    my $subseq = $seq->subseq(1, $seq->length());
-    my @sequence = split(//,$subseq);
-    $phy_seqs{$id}=[@sequence];
+# Check which input files are provided, and trigger the automatic input if necessary.
+my ($align_check, $output_check);
+if (@ARGV < 2 ) {
+print "Only one or two arguments were provided, sorry. Please note the above command to run DE-Score Calculator. You may have forgotten to specify the alignment file or the output prefix.\n";
+exit(1);
+} 
+else {
+    $align_check  = $ARGV[0];
+    $output_check = $ARGV[1];
 }
+my %phy_seqs = parse_fasta($align_check);
 
+my $freq_file = "$output_check.SiteSaturation.TotalFrequencies.txt";
+my $tax_file  = "$output_check.SiteSaturation.TaxaFrequencies.txt";
+
+# Create the critical DE-Score
 my $size = keys %phy_seqs;
+my $normalisation_constant = 0.255 * $size**-0.15;
+my $crit_DaCER             = 0.265;
+my $saturation_DaCER       = 0.177;
+my $crit = ($crit_DaCER - $saturation_DaCER) / $normalisation_constant;
+my $round_crit = sprintf("%.5f", $crit);
+
+open(FREQ, '>', $freq_file) or die "Cannot open $freq_file\n";
+print FREQ "Summary of the DE-Score Analysis\n";
+
+open(TAXA, '>', $tax_file) or die "Cannot open $tax_file\n";
+print TAXA "FileName\tExchangeFreq\tExchangeFreqStDev\tDE-Score\n";
+
+#Set up the 6 Dayhoff Categories
+my @small        = qw(A G P S T);
+my @acid_amide   = qw(D E N Q);
+my @basic        = qw(H K R);
+my @hydrophobic  = qw(I L V M);
+my @aromatic     = qw(F W Y);
+my @sulfur       = qw(C);
+my @valid_seqs   = qw(A G P S T D E N Q H K R I L V M F W Y C);
+
+# Create hashes for lookup
+my %valids = map { $_ => 1 } @valid_seqs;
+
+my %category;
+$category{$_} = 'small'        for @small;
+$category{$_} = 'acid_amide'   for @acid_amide;
+$category{$_} = 'basic'        for @basic;
+$category{$_} = 'hydrophobic'  for @hydrophobic;
+$category{$_} = 'aromatic'     for @aromatic;
+$category{$_} = 'sulfur'       for @sulfur;
+
 print "There are $size taxa in this input dataset\n";
+print "The Critical DE-Score for this dataset is thereby $round_crit \n";
+print TAXA "CRITICAL\t0.266\tN/A\t$round_crit\n";
+
 my $a = 0;
 my @all_tvs;
 my @all_tis;
 my @all_ti_freqs;
 
-### This loop counts pairwise Dayhoff Exchanges ###
-foreach my $k (keys %phy_seqs){
-    my @vals = @{ $phy_seqs{$k}};
-    my $b = 0;
-    my @tax_tvs;
-    my @tax_tis;
-    my @tax_ti_freqs;
-    
-    foreach my $compk (keys %phy_seqs){
-        next if ($k eq $compk);
-        my @comp_vals = @{ $phy_seqs{$compk}};
-        my $i = 0;
-        my $pairwise_ti = 0;
-        my $pairwise_tv = 0;
-        my $same_counter = 0;
-        my $small_counter = 0;
-        my $gap_counter = 0;
-        
-        foreach (@vals){
-            my $query = $_;
-            my $comp_query = $comp_vals[$i];
-            if ($valids{$query} && $valids{$comp_query}){
-            if ($query eq "-" || $comp_query eq "-"){
-                $gap_counter++;
-            }
-            elsif ($comp_query eq $query){
-                $same_counter++;
-            }
-            # Check for amino acids in the same category
-            elsif ($small{$query} && $small{$comp_query}) {
-                $pairwise_ti++;
-            }
-            elsif ($acid_amide{$query} && $acid_amide{$comp_query}) {
-                $pairwise_ti++;
-            }
-            elsif ($basic{$query} && $basic{$comp_query}) {
-                $pairwise_ti++;
-            }
-            elsif ($hydrophobic{$query} && $hydrophobic{$comp_query}) {
-                $pairwise_ti++;
-            }
-            elsif ($aromatic{$query} && $aromatic{$comp_query}) {
-                $pairwise_ti++;
-            }
-            elsif ($sulfur{$query} && $sulfur{$comp_query}) {
-                $pairwise_ti++;
-            }
-            else{
-                $pairwise_tv++;
-            }
-            }
-            $i++;
-        }
-        $b++;
+my @taxa_ids = sort keys %phy_seqs;
+my %taxon_tis;
+my %taxon_tvs;
+my %taxon_ti_freqs;
 
-        if ($pairwise_ti == 0 && $pairwise_tv == 0) {
-            $gap_counter++;
+# Loop avoiding redundant comparisons (i < j only)
+for (my $i = 0; $i < @taxa_ids; $i++) {
+    my $id1   = $taxa_ids[$i];
+    my @vals1 = @{ $phy_seqs{$id1} };
+    my $tracker = $i+1;
+	print "Comparing $taxa_ids[$i] Taxon $tracker of $size \n";
+    for (my $j = $i + 1; $j < @taxa_ids; $j++) {
+        my $id2   = $taxa_ids[$j];
+        my @vals2 = @{ $phy_seqs{$id2} };
+
+        my ($pairwise_ti, $pairwise_tv, $pos) = (0, 0, 0);
+
+        for my $aa1 (@vals1) {
+            my $aa2 = $vals2[$pos];
+
+            if ($valids{$aa1} && $valids{$aa2}) {
+                if ($aa1 eq "-" || $aa2 eq "-") {
+                    # skip gaps
+                } elsif ($aa1 eq $aa2) {
+                    # identical, skip
+                } elsif ($category{$aa1} && $category{$aa2} && $category{$aa1} eq $category{$aa2}) {
+                    $pairwise_ti++;
+                } else {
+                    $pairwise_tv++;
+                }
+            }
+            $pos++;
         }
-### This part pushes each pairwise TI/TV to the taxon specific and whole dataset arrays. ###
-        else{
-	        my $ti_freq = $pairwise_ti/($pairwise_ti+$pairwise_tv);
-	        push (@all_tis, $pairwise_ti);
-	        push (@all_tvs, $pairwise_tv);
-	        push (@all_ti_freqs, $ti_freq);
-	        push (@tax_tis, $pairwise_ti);
-	        push (@tax_tvs, $pairwise_tv);
-            push (@tax_ti_freqs, $ti_freq);
-        }
+
+        next if ($pairwise_ti == 0 && $pairwise_tv == 0);
+
+        my $ti_freq = ($pairwise_ti == 0) ? 0 : $pairwise_ti / ($pairwise_ti + $pairwise_tv);
+
+        push @all_tis, $pairwise_ti;
+        push @all_tvs, $pairwise_tv;
+        push @all_ti_freqs, $ti_freq;
+
+        push @{ $taxon_tis{$id1} }, $pairwise_ti;
+        push @{ $taxon_tvs{$id1} }, $pairwise_tv;
+        push @{ $taxon_ti_freqs{$id1} }, $ti_freq;
+
+        push @{ $taxon_tis{$id2} }, $pairwise_ti;
+        push @{ $taxon_tvs{$id2} }, $pairwise_tv;
+        push @{ $taxon_ti_freqs{$id2} }, $ti_freq;
     }
-### Here we do the taxon DE-Score calculation ###
-    $a++;
-    my $tax_average_transi = avg(\@tax_tis);
-    my $tax_average_transv = avg(\@tax_tvs);
-    my $tax_average_ti_freq = avg(\@tax_ti_freqs);
-    my $tax_std_transi = get_stddev(\@tax_tis);
-    my $tax_std_transv = get_stddev(\@tax_tvs);
-    my $tax_std_ti_freq =  get_stddev(\@tax_ti_freqs);
-    my $tax_dist = $tax_average_ti_freq - 0.177;
-    my $tax_DE = $tax_dist/(0.255*$size**-0.15);
-    print "\n Finished assessing $k. Taxon $a of $size";
-    print TAXA "$k\t$tax_average_ti_freq\t$tax_std_ti_freq\t$tax_DE\n";
 }
+
+foreach my $taxon_id (@taxa_ids) {
+    $a++;
+    my $tis_ref   = $taxon_tis{$taxon_id}     || [];
+    my $tvs_ref   = $taxon_tvs{$taxon_id}     || [];
+    my $freq_ref  = $taxon_ti_freqs{$taxon_id}|| [];
+
+    my $avg_freq  = avg($freq_ref);
+    my $std_freq  = get_stddev($freq_ref);
+    my $tax_dist  = $avg_freq - $saturation_DaCER;
+    my $tax_DE    = $tax_dist / $normalisation_constant;
+	my $round_avg_freq = sprintf("%.5f", $avg_freq);
+	my $round_std_freq = sprintf("%.5f", $std_freq);
+	my $round_tax_DE = sprintf("%.5f", $tax_DE);
+#    print "\n Finished assessing $taxon_id. Taxon $a of $size";
+    print TAXA "$taxon_id\t$round_avg_freq\t$round_std_freq\t$round_tax_DE\n";
+}
+
 print "\n";
-### Here we do the whole dataset DE-Score calculation ###
-my $average_transi = avg(\@all_tis);
-my $average_transv = avg(\@all_tvs);
+
+# Calculate the whole dataset DE-Score
 my $average_ti_freq = avg(\@all_ti_freqs);
-my $std_transi = get_stddev(\@all_tis);
-my $std_transv = get_stddev(\@all_tvs);
-my $std_ti_freq =  get_stddev(\@all_ti_freqs);
-my $freq_dist = $average_ti_freq - 0.177;
-my $total_DE = $freq_dist/(0.255*$size**-0.15);
+my $std_ti_freq     = get_stddev(\@all_ti_freqs);
+my $freq_dist       = $average_ti_freq - $saturation_DaCER;
+my $total_DE        = $freq_dist / $normalisation_constant;
+my $round_average_ti_freq = sprintf("%.5f", $average_ti_freq);
+my $round_std_ti_freq     = sprintf("%.5f", $std_ti_freq);
+my $round_total_DE = sprintf("%.5f", $total_DE);
 
-print FREQ "Dayhoff Category Exchange Frequency:\t$average_ti_freq\nExchange Frequency Standard Deviation:\t$std_ti_freq\nDE-Score:\t$total_DE\n";
+print FREQ "Dayhoff Category Exchange Frequency:\t$round_average_ti_freq\nExchange Frequency Standard Deviation:\t$round_std_ti_freq\nCritical DE-Score:\t$round_crit\nDE-Score:\t$round_total_DE\n";
 
-### These are the mathematics subroutines for averages, standard deviations and disparity ###
+### Math functions ###
 sub avg {
-  my ($avg_array_ref) = @_;
-  my $avg_count = @$avg_array_ref;
-  my $avg_sum = 0;
-  for my $avg_num (@$avg_array_ref) {
-      $avg_sum += $avg_num;
-  }
-  if ($avg_sum == 0){
-      return $avg_sum;
-  }
-  else{
-      return $avg_sum / $avg_count;
-  }
+    my ($arr_ref) = @_;
+    my $count = @$arr_ref;
+    return 0 if $count == 0;
+    my $sum = 0;
+    $sum += $_ for @$arr_ref;
+    return $sum / $count;
 }
 
 sub get_stddev {
-  return sqrt(get_disp(@_));
+    return sqrt(get_disp(@_));
 }
 
 sub get_disp {
-  my ($dis_array_ref) = @_;
-  my $mean = avg($dis_array_ref);
-  my $dis_count = @$dis_array_ref;
-  my $dis_sum = 0;
-  
-  for my $dis_num (@$dis_array_ref) {
-      $dis_sum += (($dis_num - $mean) ** 2);
-  }
-  if ($dis_sum == 0){
-      return $dis_sum;
-  }
-  else{
-      return $dis_sum / $dis_count;
-  }
+    my ($arr_ref) = @_;
+    my $mean  = avg($arr_ref);
+    my $count = @$arr_ref;
+    return 0 if $count == 0;
+    my $sum = 0;
+    $sum += ($_ - $mean) ** 2 for @$arr_ref;
+    return $sum / $count;
+}
+
+### FASTA Parser ###
+sub parse_fasta {
+    my ($file) = @_;
+    my %sequences;
+    open(my $fh, "<", $file) or die "Cannot open FASTA file $file\n";
+
+    my ($id, $seq) = ("", "");
+
+    while (my $line = <$fh>) {
+        chomp($line);
+        if ($line =~ /^>(\S+)/) {
+            if ($id ne "") {
+                $sequences{$id} = [split //, $seq];
+            }
+            $id = $1;
+            $seq = "";
+        } else {
+            $seq .= $line;
+        }
+    }
+
+    if ($id ne "") {
+        $sequences{$id} = [split //, $seq];
+    }
+
+    close($fh);
+    return %sequences;
 }
