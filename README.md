@@ -10,10 +10,9 @@ https://www.perl.org/get.html
 To install R, a download link can be found here:
 https://cran.r-project.org/
 
-In addition, BOSTIn requires one Perl module (BIO::SeqIO), and one R package (Phangorn). Once you have installed Perl and R, you can install those packages with these two commands:
+In addition, BOSTIn requires one R package (Phangorn). Once you have installed Perl and R, you can install that package with this command:
 
 ```
-cpanm install BIO::SeqIO
 Rscript -e 'install.packages("phangorn", repos="https://cloud.r-project.org")'
 ```
 
@@ -27,10 +26,10 @@ to find the complete address of that directory.
 
 In your home directory (~/), you will find a file called either .bashrc or .bash_profile. Add this line to the bottom of that file.
 ```
-export PATH=$PATH:<pwd address>/BOSTIn_v1_0
+export PATH=$PATH:<pwd address>/BOSTIn/BOSTIn_v1_2
 ```
 This makes sure that the next time you open your terminal, it registers the BOSTIn directory as a place to look for executables.
-Finally, go inside the BOSTIn_v1_0 directory, with all the scripts, and run the following command:
+Finally, go inside the BOSTIn_v1_2 directory, with all the scripts, and run the following command:
 ```
 chmod u+x+r *
 ```
@@ -47,17 +46,17 @@ Then, you should be ready to go! If you're having trouble installing BOSTIn, ple
 The BOSTIn command is formatted as follows:
 
 ```
-Bostin.pl <options> <datatype> <input fasta file> <output file prefix>
+BOSTIn.pl <options> <datatype> <input fasta file> <output file prefix>
 ```
 For Example:
 ```
-Bostin.pl --blh --ch --s protein test.fa test
+BOSTIn.pl --blh --ch --s protein test.fa test
 ```
 runs analyses to detect branch length heterogeneity, compositional heterogeneity and site saturation tests on the protein dataset of test.fa, and all the output files will start with test.
 
 Meanwhile,
 ```
-Bostin.pl --ch dna nucleotide.fa hello
+BOSTIn.pl --ch dna nucleotide.fa hello
 ```
 runs just an analysis to detect compositional heterogeneity on the dna dataset nucleotide.fa, and all the output files will start with hello
 
@@ -177,7 +176,7 @@ BOSTIn Genewise uses the same format as BOSTIn, with the same three options - --
 Following those options, type dna or protein based on the dataset you want to analyse, then the name of a file containing a list of fasta files you would like to analyse, with one file on each line.
 Finally, type the name of the output prefix that you would like for each of the Gene-Wise analyses. This won't affect the names of the individual per-gene analyses (they will use to the name of the input fasta file), but it will give a unique prefix to the output files that analyse the whole dataset.
 
-Bostin.GeneWise.sh [--blh] [--s] [--ch] <dna or protein> <list of fasta files> <genewise output prefix>"
+BOSTIn.GeneWise.sh [--blh] [--s] [--ch] <dna or protein> <list of fasta files> <genewise output prefix>"
 
 # Results from Gene-Wise BOSTIn
 In addition to the regular BOSTIn results files, Gene-Wise BOSTIn will produce a number of unique output files:
