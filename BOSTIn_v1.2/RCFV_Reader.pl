@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use 5.014;
-#use warnings;
-use FAST::Bio::SeqIO;
+use warnings;
+use strict;
 
 print "
 RCFV Reader, James F. Fleming & Torsten H Struck, 2022.
@@ -26,11 +26,10 @@ I hope you enjoy this fast new way to use normalised Relative Frequency Composit
 j.f.fleming\@nhm.uio.no
 ";
 #This if statement checks that the alphabet variable is valid
-if ($ARGV[0]!=~/dna/||/protein/){
+if ($ARGV[0] !~ /^(dna|protein)$/ ){
 	print "WARNING: Are you sure you remembered to specify protein or dna for amino acid or nucleotide data?\n";}
 #Set up the input and output files
-my $fasta  = FAST::Bio::SeqIO->new(-file => $ARGV[1], -format => 'Fasta', -alphabet => $ARGV[0]);
-#print "my $fasta  = FAST::Bio::SeqIO->new(-file => $ARGV[1], -format => 'Fasta', -alphabet => $ARGV[0]);";
+my $next_seq = fasta_iterator($ARGV[1]);
 my $seqnum=0;
 my $RCFV_File = "$ARGV[2].RCFV.txt";
 my $csRCFV_File = "$ARGV[2].csRCFV.txt";
@@ -45,43 +44,39 @@ open(TRCFV_OUT, '>', $tRCFV_File) or die $!;
 open(NCSRCFV_OUT,  '>', $ncsRCFV_File) or die $!;
 open(NTRCFV_OUT, '>', $ntRCFV_File) or die $!;
 
-#Nucleotide RCFV Calculator
+#Nucleotide data
 if ($ARGV[0]=~ /dna/){
 #print "boop";
-my %A_Lens;
-my %C_Lens;
-my %G_Lens;
-my %T_Lens;
-my %A_Freqs;
-my %C_Freqs;
-my %G_Freqs;
-my %T_Freqs;
-my @ID_List;
-my @Length;
+my (%A_Lens,%C_Lens,%G_Lens,%T_Lens);
+my (%A_Freqs,%C_Freqs,%G_Freqs,%T_Freqs);
+my (@ID_List,@Length);
 
 #print OUT "NAME\tFreq(A)\tFreq(C)\tFreq(G)\tFreq(T)\n";
 #Calculate frequencies and lengths
-while ( my $seq = $fasta->next_seq() ) {
+while ( my ($id, $sequence) = $next_seq->() ) {
     my $stats;
-    $stats->{len} = length($seq->seq);
-    push (@Length, length($seq->seq));
-    $stats->{$_}++ for split //, $seq->seq;
-#    say ++$seqnum, " @$stats{qw(len A C G T a c g t)}";
-    my $seqTotal = @$stats{qw(A)} + @$stats{qw(C)} + @$stats{qw(T)} + @$stats{qw(G)} +@$stats{qw(a)} +@$stats{qw(c)} +@$stats{qw(t)} +@$stats{qw(g)};
+    $stats->{len} = length($sequence);
+    push @Length, length($sequence);
+    $stats->{$_}++ for split //, $sequence;
+	$stats->{$_} //= 0 for qw(A C G T a c g t);
+    my $seqTotal =
+        @$stats{qw(A)} + @$stats{qw(C)} + @$stats{qw(G)} + @$stats{qw(T)} +
+        @$stats{qw(a)} + @$stats{qw(c)} + @$stats{qw(g)} + @$stats{qw(t)};
+
     my $seqA_Freq = (@$stats{qw(A)} + @$stats{qw(a)})/$seqTotal;
     my $seqC_Freq = (@$stats{qw(C)} + @$stats{qw(c)})/$seqTotal;
     my $seqG_Freq = (@$stats{qw(G)} + @$stats{qw(g)})/$seqTotal;
     my $seqT_Freq = (@$stats{qw(T)} + @$stats{qw(t)})/$seqTotal;
-#	print OUT $seq->id, "\t", $seqA_Freq, "\t", $seqC_Freq, "\t", $seqG_Freq, "\t", $seqT_Freq, "\n";
-	push (@ID_List, ($seq->id));
-    $A_Lens{$seq->id} = @$stats{qw(A)}+@$stats{qw(a)};
-	$C_Lens{$seq->id} = @$stats{qw(C)}+@$stats{qw(c)};
-	$G_Lens{$seq->id} = @$stats{qw(G)}+@$stats{qw(g)};
-	$T_Lens{$seq->id} = @$stats{qw(T)}+@$stats{qw(t)};
-    $A_Freqs{$seq->id} = $seqA_Freq;
-    $C_Freqs{$seq->id} = $seqC_Freq;
-    $G_Freqs{$seq->id} = $seqG_Freq;
-    $T_Freqs{$seq->id} = $seqT_Freq;
+
+    print OUT $id, "\t", $seqA_Freq, "\t", $seqC_Freq, "\t",
+              $seqG_Freq, "\t", $seqT_Freq, "\n";
+
+    push @ID_List, $id;
+
+    $A_Freqs{$id} = $seqA_Freq;
+    $C_Freqs{$id} = $seqC_Freq;
+    $G_Freqs{$id} = $seqG_Freq;
+    $T_Freqs{$id} = $seqT_Freq;
 }
 
 my %check;
@@ -171,63 +166,31 @@ $T_RCFV/(($Length[0]**-0.5)*100), "\n";
 print RCFV_OUT "total RCFV\nRCFV\t", $RCFV, "\nnRCFV\t", $nRCFV, "\n";
 }
 
-#AA data
+#Amino acid data
 elsif ($ARGV[0]=~/protein/){
-my %A_Len;
-my %V_Len;
-my %L_Len;
-my %I_Len;
-my %P_Len;
-my %M_Len;
-my %F_Len;
-my %W_Len;
-my %G_Len;
-my %S_Len;
-my %T_Len;
-my %C_Len;
-my %N_Len;
-my %Q_Len;
-my %Y_Len;
-my %D_Len;
-my %E_Len;
-my %K_Len;
-my %R_Len;
-my %H_Len;
 
-my %A_Freqs;
-my %V_Freqs;
-my %L_Freqs;
-my %I_Freqs;
-my %P_Freqs;
-my %M_Freqs;
-my %F_Freqs;
-my %W_Freqs;
-my %G_Freqs;
-my %S_Freqs;
-my %T_Freqs;
-my %C_Freqs;
-my %N_Freqs;
-my %Q_Freqs;
-my %Y_Freqs;
-my %D_Freqs;
-my %E_Freqs;
-my %K_Freqs;
-my %R_Freqs;
-my %H_Freqs;
-
-my @ID_List;
-my @Length;
+my (%A_Len, %V_Len, %L_Len, %I_Len, %P_Len, %M_Len, %F_Len, %W_Len, %G_Len, %S_Len, %T_Len, %C_Len, %N_Len, %Q_Len, %Y_Len, %D_Len, %E_Len, %K_Len, %R_Len, %H_Len);
+my (%A_Freqs, %V_Freqs, %L_Freqs, %I_Freqs, %P_Freqs, %M_Freqs, %F_Freqs, %W_Freqs, %G_Freqs, %S_Freqs, %T_Freqs, %C_Freqs, %N_Freqs, %Q_Freqs, %Y_Freqs, %D_Freqs, %E_Freqs, %K_Freqs, %R_Freqs, %H_Freqs);
+my (@ID_List, @Length); 
 
 print OUT "NAME\tFreq(A)\tFreq(V)\tFreq(L)\tFreq(I)\tFreq(P)\tFreq(M)\tFreq(F)\tFreq(W)\tFreq(G)\tFreq(S)\tFreq(T)\tFreq(C)\tFreq(N)\tFreq(Q)\tFreq(Y)\tFreq(D)\tFreq(E)\tFreq(K)\tFreq(R)\tFreq(H)\n";
-while ( my $seq = $fasta->next_seq() ) {
+
+while ( my ($id, $sequence) = $next_seq->() ) {
+
     my $stats;
-    $stats->{len} = length($seq->seq);
-    push (@Length, length($seq->seq));
-    $stats->{$_}++ for split //, $seq->seq;
-#   say ++$seqnum, " @$stats{qw(len A V L I P M F W G S T C N Q Y D E K R H)}";
-#Calculate frequencies and lengths
-    my $seqTotal = @$stats{qw(A)} + @$stats{qw(V)} + @$stats{qw(L)} + @$stats{qw(I)} + @$stats{qw(P)} + @$stats{qw(M)} + @$stats{qw(F)} + @$stats{qw(W)} + @$stats{qw(G)} + @$stats{qw(S)} + @$stats{qw(T)} + 
-@$stats{qw(C)} + @$stats{qw(N)} + @$stats{qw(Q)} + @$stats{qw(Y)} + @$stats{qw(D)} + @$stats{qw(E)} + @$stats{qw(K)} + @$stats{qw(R)} + @$stats{qw(H)};
+    $stats->{len} = length($sequence);
+    push @Length, length($sequence);
+    $stats->{$_}++ for split //, $sequence;
+	$stats->{$_} //= 0 for qw(A V L I P M F W G S T C N Q Y D E K R H);
+
+    my $seqTotal =
+          @$stats{qw(A)} + @$stats{qw(V)} + @$stats{qw(L)} + @$stats{qw(I)}
+        + @$stats{qw(P)} + @$stats{qw(M)} + @$stats{qw(F)} + @$stats{qw(W)}
+        + @$stats{qw(G)} + @$stats{qw(S)} + @$stats{qw(T)} + @$stats{qw(C)}
+        + @$stats{qw(N)} + @$stats{qw(Q)} + @$stats{qw(Y)} + @$stats{qw(D)}
+        + @$stats{qw(E)} + @$stats{qw(K)} + @$stats{qw(R)} + @$stats{qw(H)};
+    next if $seqTotal == 0;
+
     my $seqA_Freq = @$stats{qw(A)}/$seqTotal;
     my $seqV_Freq = @$stats{qw(V)}/$seqTotal;
     my $seqL_Freq = @$stats{qw(L)}/$seqTotal;
@@ -248,54 +211,59 @@ while ( my $seq = $fasta->next_seq() ) {
     my $seqK_Freq = @$stats{qw(K)}/$seqTotal;
     my $seqR_Freq = @$stats{qw(R)}/$seqTotal;
     my $seqH_Freq = @$stats{qw(H)}/$seqTotal;
-    
-	print OUT $seq->id, "\t", $seqA_Freq ,"\t",    $seqV_Freq ,"\t",    $seqL_Freq ,"\t",    $seqI_Freq ,"\t",    $seqP_Freq ,"\t",    $seqM_Freq ,"\t",    $seqF_Freq ,"\t",    $seqW_Freq ,"\t",    $seqG_Freq 
-,"\t",    $seqS_Freq ,"\t",    $seqT_Freq ,"\t",    $seqC_Freq ,"\t",    $seqN_Freq ,"\t",    $seqQ_Freq ,"\t",    $seqY_Freq ,"\t",    $seqD_Freq ,"\t",    $seqE_Freq ,"\t",    $seqK_Freq ,"\t",    $seqR_Freq 
-,"\t",    $seqH_Freq , "\n";
-	push (@ID_List, ($seq->id));
-    $A_Len{$seq->id} = @$stats{qw(A)};
-    $V_Len{$seq->id} = @$stats{qw(V)};
-    $L_Len{$seq->id} = @$stats{qw(L)};
-    $I_Len{$seq->id} = @$stats{qw(I)};
-    $P_Len{$seq->id} = @$stats{qw(P)};
-    $M_Len{$seq->id} = @$stats{qw(M)};
-    $F_Len{$seq->id} = @$stats{qw(F)};
-    $W_Len{$seq->id} = @$stats{qw(W)};
-    $G_Len{$seq->id} = @$stats{qw(G)};
-    $S_Len{$seq->id} = @$stats{qw(S)};
-    $T_Len{$seq->id} = @$stats{qw(T)};
-    $C_Len{$seq->id} = @$stats{qw(C)};
-    $N_Len{$seq->id} = @$stats{qw(N)};
-    $Q_Len{$seq->id} = @$stats{qw(Q)};
-    $Y_Len{$seq->id} = @$stats{qw(Y)};
-    $D_Len{$seq->id} = @$stats{qw(D)};
-    $E_Len{$seq->id} = @$stats{qw(E)};
-    $K_Len{$seq->id} = @$stats{qw(K)};
-    $R_Len{$seq->id} = @$stats{qw(R)};
-    $H_Len{$seq->id} = @$stats{qw(H)};
 
-    $A_Freqs{$seq->id} = $seqA_Freq;
-    $V_Freqs{$seq->id} = $seqV_Freq;
-    $L_Freqs{$seq->id} = $seqL_Freq;
-    $I_Freqs{$seq->id} = $seqI_Freq;
-    $P_Freqs{$seq->id} = $seqP_Freq;
-    $M_Freqs{$seq->id} = $seqM_Freq;
-    $F_Freqs{$seq->id} = $seqF_Freq;
-    $W_Freqs{$seq->id} = $seqW_Freq;
-    $G_Freqs{$seq->id} = $seqG_Freq;
-    $S_Freqs{$seq->id} = $seqS_Freq;
-    $T_Freqs{$seq->id} = $seqT_Freq;
-    $C_Freqs{$seq->id} = $seqC_Freq;
-    $N_Freqs{$seq->id} = $seqN_Freq;
-    $Q_Freqs{$seq->id} = $seqQ_Freq;
-    $Y_Freqs{$seq->id} = $seqY_Freq;
-    $D_Freqs{$seq->id} = $seqD_Freq;
-    $E_Freqs{$seq->id} = $seqE_Freq;
-    $K_Freqs{$seq->id} = $seqK_Freq;
-    $R_Freqs{$seq->id} = $seqR_Freq;
-    $H_Freqs{$seq->id} = $seqH_Freq;
+    print OUT $id, "\t",
+        $seqA_Freq, "\t", $seqV_Freq, "\t", $seqL_Freq, "\t", $seqI_Freq, "\t",
+        $seqP_Freq, "\t", $seqM_Freq, "\t", $seqF_Freq, "\t", $seqW_Freq, "\t",
+        $seqG_Freq, "\t", $seqS_Freq, "\t", $seqT_Freq, "\t", $seqC_Freq, "\t",
+        $seqN_Freq, "\t", $seqQ_Freq, "\t", $seqY_Freq, "\t", $seqD_Freq, "\t",
+        $seqE_Freq, "\t", $seqK_Freq, "\t", $seqR_Freq, "\t", $seqH_Freq, "\n";
 
+    push @ID_List, $id;
+
+    $A_Len{$id} = @$stats{qw(A)};
+    $V_Len{$id} = @$stats{qw(V)};
+    $L_Len{$id} = @$stats{qw(L)};
+    $I_Len{$id} = @$stats{qw(I)};
+    $P_Len{$id} = @$stats{qw(P)};
+    $M_Len{$id} = @$stats{qw(M)};
+    $F_Len{$id} = @$stats{qw(F)};
+    $W_Len{$id} = @$stats{qw(W)};
+    $G_Len{$id} = @$stats{qw(G)};
+    $S_Len{$id} = @$stats{qw(S)};
+    $T_Len{$id} = @$stats{qw(T)};
+    $C_Len{$id} = @$stats{qw(C)};
+    $N_Len{$id} = @$stats{qw(N)};
+    $Q_Len{$id} = @$stats{qw(Q)};
+    $Y_Len{$id} = @$stats{qw(Y)};
+    $D_Len{$id} = @$stats{qw(D)};
+    $E_Len{$id} = @$stats{qw(E)};
+    $K_Len{$id} = @$stats{qw(K)};
+    $R_Len{$id} = @$stats{qw(R)};
+    $H_Len{$id} = @$stats{qw(H)};
+
+    $A_Freqs{$id} = $seqA_Freq;
+    $V_Freqs{$id} = $seqV_Freq;
+    $L_Freqs{$id} = $seqL_Freq;
+    $I_Freqs{$id} = $seqI_Freq;
+    $P_Freqs{$id} = $seqP_Freq;
+    $M_Freqs{$id} = $seqM_Freq;
+    $F_Freqs{$id} = $seqF_Freq;
+    $W_Freqs{$id} = $seqW_Freq;
+    $G_Freqs{$id} = $seqG_Freq;
+    $S_Freqs{$id} = $seqS_Freq;
+    $T_Freqs{$id} = $seqT_Freq;
+    $C_Freqs{$id} = $seqC_Freq;
+    $N_Freqs{$id} = $seqN_Freq;
+    $Q_Freqs{$id} = $seqQ_Freq;
+    $Y_Freqs{$id} = $seqY_Freq;
+    $D_Freqs{$id} = $seqD_Freq;
+    $E_Freqs{$id} = $seqE_Freq;
+    $K_Freqs{$id} = $seqK_Freq;
+    $R_Freqs{$id} = $seqR_Freq;
+    $H_Freqs{$id} = $seqH_Freq;
 }
+
 
 my %check;
 @check{@Length} = (1) x @Length;
@@ -330,8 +298,7 @@ my $Total = $A_total + $V_total + $L_total + $I_total + $P_total + $M_total + $F
 $R_total + $H_total;
 
 
-#print $Total, "\t", $A_total, "\t", $V_total ,"\t", $L_total ,"\t", $I_total ,"\t", $P_total ,"\t", $M_total ,"\t", $F_total ,"\t", $W_total ,"\t", $G_total ,"\t", $S_total ,"\t", $T_total ,"\t", $C_total ,"\t", 
-$N_total ,"\t", $Q_total ,"\t", $Y_total ,"\t", $D_total ,"\t", $E_total ,"\t", $K_total ,"\t", $R_total ,"\t", $H_total, "\n";
+#print $Total, "\t", $A_total, "\t", $V_total ,"\t", $L_total ,"\t", $I_total ,"\t", $P_total ,"\t", $M_total ,"\t", $F_total ,"\t", $W_total ,"\t", $G_total ,"\t", $S_total ,"\t", $T_total ,"\t", $C_total ,"\t", $N_total ,"\t", $Q_total ,"\t", $Y_total ,"\t", $D_total ,"\t", $E_total ,"\t", $K_total ,"\t", $R_total ,"\t", $H_total, "\n";
 #Calculate mean frequencies
 my $MeanA_Freq = ($A_total/$Total);
 my $MeanV_Freq = ($V_total/$Total);
@@ -584,6 +551,7 @@ print NCSRCFV_OUT "character nRCFV values:\nncsRCFV(A)\t", $A_RCFV/(($Length[0]*
 print RCFV_OUT "total RCFV\nRCFV\t", $RCFV, "\nnRCFV\t", $nRCFV, "\n";
 }
 
+
 else {
 print "Are you sure you remembered to specify protein or dna for amino acid or nucleotide data?" and die $!;
 }
@@ -610,3 +578,28 @@ TIME
 		
 }
 
+sub fasta_iterator {
+    my ($filename) = @_;
+    open my $FH, '<', $filename or die "Cannot open $filename: $!";
+
+    my ($id, $seq) = (undef, '');
+    return sub {
+        while (my $line = <$FH>) {
+            chomp $line;
+            if ($line =~ /^>(.*)/) {
+                my ($old_id, $old_seq) = ($id, $seq);
+                $id  = $1;
+                $seq = '';
+                return ($old_id, $old_seq) if defined $old_id;
+            } else {
+                $seq .= $line;
+            }
+        }
+        if (defined $id) {
+            my ($old_id, $old_seq) = ($id, $seq);
+            $id = undef;
+            return ($old_id, $old_seq);
+        }
+        return;
+    };
+}
