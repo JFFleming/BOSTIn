@@ -26,10 +26,10 @@ to find the complete address of that directory.
 
 In your home directory (~/), you will find a file called either .bashrc or .bash_profile. Add this line to the bottom of that file.
 ```
-export PATH=$PATH:<pwd address>/BOSTIn/BOSTIn_v1_2
+export PATH=$PATH:<pwd address>/BOSTIn/BOSTIn_v1_3
 ```
 This makes sure that the next time you open your terminal, it registers the BOSTIn directory as a place to look for executables.
-Finally, go inside the BOSTIn_v1_2 directory, with all the scripts, and run the following command:
+Finally, go inside the BOSTIn_v1_3 directory, with all the scripts, and run the following command:
 ```
 chmod u+x+r *
 ```
