@@ -8,15 +8,24 @@ my $fulldummy = <$summFile>;
 
 my $totalDE;
 my $TIFreq;
+my $crittDE;
 
 while(<$summFile>){
 	my $summline = $_;
 	chomp($summline);
 	my @splitter = split(/\t/, $summline);
-	$totalDE = $splitter[3];
+	if ($summline =~ /^DE-Score/){
+		$totalDE = $splitter[1];
+		}
+	if ($summline =~ /^Dayhoff Category Exchange Frequency/){
 	$TIFreq = $splitter[1];
+	}
+	if ($summline =~ /^Critical DE-Score/){
+	$crittDE = $splitter[1];
+	}
 }
 close($summFile);
+$crittDE=sprintf("%.5f", $crittDE);
 
 print "DE-Score
 	As you are using amino acid data, we selected the DE-Score - the Dayhoff Exchange Score. This is based on the ratio of pairwise within Dayhoff Category changes and between Dayhoff Category changes throughout the alignment. It also has the advantage that it can be used to detect taxa that are particularly saturated. We call this the tDE-Score.
@@ -71,12 +80,13 @@ elsif ($tDE_median < $tDE_mean){
 else{
 	print "Your median and mean are equivalent, which suggests that saturation is well distributed across your dataset.";
 }
-print "Beyond this, we can identify potentially problematic sequences by using the same method as for the whole dataset. We can observe which specific taxa have DE-Scores below 0. We mark these as highly saturated Red Flag taxa. We can also mark taxa with DE-Scores below 0.354 as slightly saturated Yellow Flags.
-	The Red Flag taxa are:
-	@tDE_red
-	The Yellow Flag taxa are:
-	@tDE_yellow
-";
+print "Beyond this, we can identify potentially problematic sequences in two ways. First, we can observe which specific taxa have DE-Scores below 0. We mark these as highly saturated Red Flag taxa. However, as we are comparing within the same dataset to seek out problematic taxa, we can also mark taxa with Dayhoff Category Exchange Frequencies below 0.354 as slightly saturated Yellow Flags. We can do this by generating a Critical DE-Score, which is the DE-Score if the Dayhoff Category Exchange Frequencies is 0.354.
+	The Critical DE-Score for this dataset is: $crittDE 
+	The Red Flag taxa are:\n";
+print join("\n", @tDE_red);
+print "\nThe Yellow Flag taxa are:\n";
+print join("\n", @tDE_yellow);
+print "\n";
 
 sub summaryStats {
 	open (my $input, '<', $_[0]);
