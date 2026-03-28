@@ -23,7 +23,7 @@ for(i in 1:length(SAT[,2])){
 		yellowGene <- paste(SAT[i,1], "\t", SAT[i,2], "\n")
 		yellowList<- append(yellowList, yellowGene)
 	}
-	else if(SAT[i,2] <= 0.354){
+	else if(SAT[i,2] <= SAT[i,3]){
 		yellowGene <- paste(SAT[i,1], "\t", SAT[i,2], "\n")
 		yellowList<- append(yellowList, yellowGene)
 	}
@@ -50,7 +50,7 @@ summ_min = min(SAT[,2])
 summ_list <- append(summ_list, paste("minimum\t", summ_min, "\n"))
 summ_max = max(SAT[,2])
 summ_list <- append(summ_list, paste("maximum\t", summ_max, "\n"))
-summ_list <- append(summ_list, "\n\nFor the DE-Score, values below 0 are considered to be saturated to an uninformative degree. We mark these genes as Red Flags. Since the uninformative ratio of the DE-Score is 0.177, we use two steps of uninformativeness and mark all genes with a DE-Score below 0.354 as Yellow Flags.\n Red Flags are sequences that may be too saturated to be informative, while Yellow Flags are ones to keep an eye on, as they may potentially cause problems in the dataset.\n")
+summ_list <- append(summ_list, "\n\nFor the DE-Score, values below 0 are considered to be saturated to an uninformative degree. We mark these genes as Red Flags. Since the uninformative ratio of the DE-Score changes based on the dataset, we also use two steps of uninformativeness and mark all genes with a DE-Score below the Critical DE-Score for that dataset as Yellow Flags. You can find a list of the Critical DE-Scores for each gene as the third column in the summary.txt file. \n Red Flags are sequences that may be too saturated to be informative, while Yellow Flags are ones to keep an eye on, as they may potentially cause problems in the dataset.\n")
 summ_list <- append(summ_list, paste("You can find your list of Yellow Flag and Red Flag genes here:\n",yellowfile,"\n",redfile,"\nIn addition, we have included them below for convenience.\nYour Red Flag genes are:\n"))
 summ_list <- append(summ_list, paste(redList, sep="\n"))
 summ_list <- append(summ_list, "\nYour Yellow Flag genes are:\n")
