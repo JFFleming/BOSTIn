@@ -44,8 +44,8 @@ for opt in "${OPTIONS[@]}"; do
             ;;
         --s)
             if [ "$ARG1" = "protein" ]; then
-				grep 'DE-Score:' *.SiteSaturation.TotalFrequencies.txt | sed -e s'/.SiteSaturation.TotalFrequencies.txt:DE-Score://'g -e '1i\'$'\n''Fasta File	DE-Score'$'\n' -e s'/    /\t/' > $3.DEScore.fastaSummary.txt;
-                Genewise.DEScoreReport.r $3.DEScore.fastaSummary.txt
+				paste  <(grep '^DE-Score:' *.SiteSaturation.TotalFrequencies.txt | sed 's/.SiteSaturation.TotalFrequencies.txt:DE-Score:[[:space:]]*/ /')  <(grep '^Critical DE-Score:' *.SiteSaturation.TotalFrequencies.txt | sed 's/.*Critical DE-Score:[[:space:]]*/ /') | awk '{print $1, $2, $3}' > "$3.DEScore.fastaSummary.txt"                
+				Genewise.DEScoreReport.r $3.DEScore.fastaSummary.txt
             elif [ "$ARG1" = "dna" ]; then
 				grep 'CScore' *.SiteSaturation.TotalCScore.txt | sed -e s'/.SiteSaturation.TotalFrequencies.txt:CScore//'g -e '1i\'$'\n''Fasta File	CScore'$'\n' -e s'/    /\t/' > $3.CScore.fastaSummary.txt; 
                 Genewise.CScoreReport.r $3.CScore.fastaSummary.txt
