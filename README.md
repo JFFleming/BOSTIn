@@ -202,13 +202,20 @@ In addition to the regular BOSTIn results files, Gene-Wise BOSTIn will produce a
 \<prefix\>.\<DEScore or CScore\>.fastaSummary.SiteSaturation.GeneWise.yellowflags.txt  - This is a list of the genes identified as yellow flags for site saturation based on either the DE-Score or the C-Score
 \<prefix\>.\<DEScore or CScore\>.fastaSummary.SiteSaturation.NarrativeSummary.txt - This is the narrative summary explaining the distribution of saturation across the dataset.
 
+# Citations and References
+If you use BOSTIn, please cite this Github Repository for the actual software, and then the appropriate citations below for each of the metrics that you used in your analysis.
+_nRCFV:_ Fleming, J.F. and Struck, T.H., 2023. nRCFV: a new, dataset-size-independent metric to quantify compositional heterogeneity in nucleotide and amino acid datasets. BMC bioinformatics, 24(1), p.145.
+_LB-Score:_ Struck, T.H., 2014. TreSpEx–-detection of misleading signal in phylogenetic reconstructions based on tree information. Evolutionary Bioinformatics, 10, pp.EBO-S14239.
+_C-Score:_ Kück, P. and Struck, T.H., 2014. BaCoCa–A heuristic software tool for the parallel assessment of sequence biases in hundreds of gene and taxon partitions. Molecular phylogenetics and evolution, 70, pp.94-98.
+_DE-Score:_ Fleming, J.F. and Struck, T.H., 2026. The Dayhoff Exchange Score: A New Metric to Quantify Entropic Site Saturation in Amino Acid Data Sets Prior to Phylogenetic Analysis. Systematic Biology, p.syag009.
+
+If you are interested in learning more about methodological incongruence in phylogenetics, I'd also like to point you towards our review on the topic, but also a few other reviews that really informed the work of BOSTIn:
+Fleming, J.F., Valero‐Gracia, A. and Struck, T.H., 2023. Identifying and addressing methodological incongruence in phylogenomics: A review. Evolutionary applications, 16(6), pp.1087-1104.
+Lozano-Fernandez, J., 2022. A practical guide to design and assess a phylogenomic study. Genome Biology and Evolution, 14(9), p.evac129.
+Kapli, P., Flouri, T. and Telford, M.J., 2021. Systematic errors in phylogenetic trees. Current Biology, 31(2), pp.R59-R64.
+Mirarab, S., Bayzid, M.S. and Warnow, T., 2016. Evaluating summary methods for multilocus species tree estimation in the presence of incomplete lineage sorting. Systematic Biology, 65(3), pp.366-380.
+
 # A Very Minor Note: The BOSTIn playlist
 As a minor note, as with all my software and research projects, I've attached a playlist as a subset of what I was listening to at the time! BOSTIn is inspired by my hometown, Birmingham, and was written over the Norwegian winter, so I really plumbed back into some good Brummie bands, a lot of stuff from my nostalgic teenager-hood!
 
 https://www.youtube.com/playlist?list=PLhvDtI0qOMjnn18Ap5gnIk-lDFe1nj4hx
-
-
-# References
-Struck, T.H., 2014. TreSpEx–-detection of misleading signal in phylogenetic reconstructions based on tree information. Evolutionary Bioinformatics, 10, pp.EBO-S14239.
-
-Fleming, J.F. and Struck, T.H., 2023. nRCFV: a new, dataset-size-independent metric to quantify compositional heterogeneity in nucleotide and amino acid datasets. BMC bioinformatics, 24(1), p.145.
