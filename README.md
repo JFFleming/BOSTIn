@@ -204,10 +204,14 @@ In addition to the regular BOSTIn results files, Gene-Wise BOSTIn will produce a
 
 # Citations and References
 If you use BOSTIn, please cite this Github Repository for the actual software, and then the appropriate citations below for each of the metrics that you used in your analysis.
-_nRCFV:_ Fleming, J.F. and Struck, T.H., 2023. nRCFV: a new, dataset-size-independent metric to quantify compositional heterogeneity in nucleotide and amino acid datasets. BMC bioinformatics, 24(1), p.145.
-_LB-Score:_ Struck, T.H., 2014. TreSpEx–-detection of misleading signal in phylogenetic reconstructions based on tree information. Evolutionary Bioinformatics, 10, pp.EBO-S14239.
-_C-Score:_ Kück, P. and Struck, T.H., 2014. BaCoCa–A heuristic software tool for the parallel assessment of sequence biases in hundreds of gene and taxon partitions. Molecular phylogenetics and evolution, 70, pp.94-98.
-_DE-Score:_ Fleming, J.F. and Struck, T.H., 2026. The Dayhoff Exchange Score: A New Metric to Quantify Entropic Site Saturation in Amino Acid Data Sets Prior to Phylogenetic Analysis. Systematic Biology, p.syag009.
+
+**nRCFV:** Fleming, J.F. and Struck, T.H., 2023. nRCFV: a new, dataset-size-independent metric to quantify compositional heterogeneity in nucleotide and amino acid datasets. BMC bioinformatics, 24(1), p.145.
+
+**LB-Score:** Struck, T.H., 2014. TreSpEx–-detection of misleading signal in phylogenetic reconstructions based on tree information. Evolutionary Bioinformatics, 10, pp.EBO-S14239.
+
+**C-Score:** Kück, P. and Struck, T.H., 2014. BaCoCa–A heuristic software tool for the parallel assessment of sequence biases in hundreds of gene and taxon partitions. Molecular phylogenetics and evolution, 70, pp.94-98.
+
+**DE-Score:** Fleming, J.F. and Struck, T.H., 2026. The Dayhoff Exchange Score: A New Metric to Quantify Entropic Site Saturation in Amino Acid Data Sets Prior to Phylogenetic Analysis. Systematic Biology, p.syag009.
 
 If you are interested in learning more about methodological incongruence in phylogenetics, I'd also like to point you towards our review on the topic, but also a few other reviews that really informed the work of BOSTIn:
 Fleming, J.F., Valero‐Gracia, A. and Struck, T.H., 2023. Identifying and addressing methodological incongruence in phylogenomics: A review. Evolutionary applications, 16(6), pp.1087-1104.
