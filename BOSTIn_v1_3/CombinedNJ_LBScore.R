@@ -68,7 +68,7 @@ write(paste0("Minimum\t", quantile(result_matrix[,2])[1]), file=a_out, append=TR
 write(paste0("LowerQuartile\t", quantile(result_matrix[,2])[2]), file=a_out, append=TRUE)
 write(paste0("UpperQuartile\t", quantile(result_matrix[,2])[4]), file=a_out, append=TRUE)
 write(paste0("Maximum\t", quantile(result_matrix[,2])[5]), file=a_out, append=TRUE)
-write(paste0("stdDevUpperQuartile\t", sd(UQ)), file=a_out, append=TRUE)
+write(paste0("MeanUpperQuartile\t", mean(UQ)), file=a_out, append=TRUE)
 
 t_pdf <- paste0(tools::file_path_sans_ext(a_out),".histogram.pdf")
 pdf(file = t_pdf, width=4, height=4)
