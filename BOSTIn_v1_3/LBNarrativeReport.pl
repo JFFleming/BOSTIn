@@ -38,18 +38,18 @@ my $mad=$stats{MAD};
 my $bigmad = $stats{Median}+(2*$mad);
 my $smallmad = $stats{Median}+(3*$mad);
 my $UQ = $stats{UpperQuartile};
-my $UQStdDev = $stats {stdDevUpperQuartile};
-my $UQBound1 = $UQ+$UQStdDev;
-my $UQBound2 = $UQ+(2*$UQStdDev);
+my $StdDev = $stats {standardDeviation};
+my $UBound1 = $stats{Mean}+(2*$StdDev);
+my $UBound2 = $stats{Mean}+(2.5*$StdDev);
 #print $bigsd2, "\n";
 #print $smallsd2, "\n";
 
 foreach my $key (keys %taxaHash){
 #	print $taxaHash{$key}, "\n";
-	if ($taxaHash{$key} > $UQBound2){
+	if ($taxaHash{$key} > $UBound2){
 		push (@redFlag, $key);
 		}
-	if ($taxaHash{$key} > $UQBound1){
+	if ($taxaHash{$key} > $UBound1){
 		push (@yellowFlag, $key);
 	}
 }
@@ -71,9 +71,9 @@ print "LB Score
 	To read more about this, see the BOSTIn manuscript when it appears in pre-print (I'll add a reference here later!)
 	
 	The taxa specific LB-Scores in your dataset range from $stats{Minimum} to $stats{Maximum} , with a mean of $stats{Mean} and a standard deviation of $stats{standardDeviation} . 
-	Using the median and the median absolute deviation, which is similar to a standard deviation, but for medians, we can use the LB-Score to more robustly identify suspect long-branched taxa by assessing which taxa are outside of two, and then 3 median absolute deviations of the median. 
+	Using the mean and the standard deviation, we can use the LB-Score to more robustly identify suspect long-branched taxa by assessing which taxa are outside of two, and then two and a half standard deviations of the mean. 
 	This is because it is the extremes of branch length heterogeneity that can cause the greatest problems. 
-	The median absolute deviation is $mad , and so the median plus two median absolute deviations is $smallmad , while plus three median absolute deviations is $bigmad .
+	The standard deviation is $stats{standardDeviation} , and so the mean plus two standard deviations is $UBound1 , while plus two and a half standard deviations is $UBound2 .
     We've identified taxa beyond these bounds as Yellow Flags and Red Flags respectively, as with the other measurements in BOSTIn.
 	Your Red Flag Taxa are:
 	@redFlag
